@@ -71,7 +71,9 @@ type (
 		muResponses sync.RWMutex
 		responses   map[uint64]Callback
 
-		connectedCallback func() // connected callback
+		connectedCallback func()            // connected callback
+		routes            map[string]uint16 // copy system routes for agent
+		codes             map[uint16]string // copy system codes for agent
 	}
 )
 
@@ -84,6 +86,8 @@ func NewConnector() *Connector {
 		mid:       1,
 		events:    map[string]Callback{},
 		responses: map[uint64]Callback{},
+		routes:    make(map[string]uint16),
+		codes:     make(map[uint16]string),
 	}
 }
 
@@ -192,7 +196,7 @@ func (c *Connector) setResponseHandler(mid uint64, cb Callback) {
 }
 
 func (c *Connector) sendMessage(msg *message.Message) error {
-	data, err := msg.Encode()
+	data, err := msg.Encode(c.routes)
 	if err != nil {
 		return err
 	}
@@ -262,7 +266,7 @@ func (c *Connector) processPacket(p *packet.Packet) {
 		c.send(had)
 		c.connectedCallback()
 	case packet.Data:
-		msg, err := message.Decode(p.Data)
+		msg, err := message.Decode(p.Data, c.codes)
 		if err != nil {
 			log.Println(err.Error())
 			return

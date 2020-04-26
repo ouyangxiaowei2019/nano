@@ -274,7 +274,7 @@ func (h *LocalHandler) processPacket(agent *agent, p *packet.Packet) error {
 				agent.conn.RemoteAddr().String())
 		}
 
-		msg, err := message.Decode(p.Data)
+		msg, err := message.Decode(p.Data, agent.codes)
 		if err != nil {
 			return err
 		}

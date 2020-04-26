@@ -26,6 +26,7 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/lonng/nano/internal/env"
 	"github.com/lonng/nano/internal/log"
 )
 
@@ -54,14 +55,16 @@ var types = map[Type]string{
 	Push:     "Push",
 }
 
+var (
+	// Routes is default routes for meesage
+	Routes map[string]uint16 = make(map[string]uint16)
+	// Codes is default codes for meesage
+	Codes map[uint16]string = make(map[uint16]string)
+)
+
 func (t Type) String() string {
 	return types[t]
 }
-
-var (
-	routes = make(map[string]uint16) // route map to code
-	codes  = make(map[uint16]string) // code map to route
-)
 
 // Errors that could be occurred in message codec
 var (
@@ -90,8 +93,8 @@ func (m *Message) String() string {
 }
 
 // Encode marshals message to binary format.
-func (m *Message) Encode() ([]byte, error) {
-	return Encode(m)
+func (m *Message) Encode(routes map[string]uint16) ([]byte, error) {
+	return Encode(m, routes)
 }
 
 func routable(t Type) bool {
@@ -116,7 +119,7 @@ func invalidType(t Type) bool {
 // ------------------------------------------
 // The figure above indicates that the bit does not affect the type of message.
 // See ref: https://github.com/lonnng/nano/blob/master/docs/communication_protocol.md
-func Encode(m *Message) ([]byte, error) {
+func Encode(m *Message, routes map[string]uint16) ([]byte, error) {
 	if invalidType(m.Type) {
 		return nil, ErrWrongMessageType
 	}
@@ -161,7 +164,7 @@ func Encode(m *Message) ([]byte, error) {
 
 // Decode unmarshal the bytes slice to a message
 // See ref: https://github.com/lonnng/nano/blob/master/docs/communication_protocol.md
-func Decode(data []byte) (*Message, error) {
+func Decode(data []byte, codes map[uint16]string) (*Message, error) {
 	if len(data) < msgHeadLength {
 		return nil, ErrInvalidMessage
 	}
@@ -213,9 +216,11 @@ func Decode(data []byte) (*Message, error) {
 	return m, nil
 }
 
-// SetDictionary set routes map which be used to compress route.
-// TODO(warning): set dictionary in runtime would be a dangerous operation!!!!!!
-func SetDictionary(dict map[string]uint16) {
+// TransformDictionary transfrom user defined dict into routes and codes
+func TransformDictionary(dict map[string]uint16) (map[string]uint16, map[uint16]string) {
+	routes := make(map[string]uint16)
+	codes := make(map[uint16]string)
+
 	for route, code := range dict {
 		r := strings.TrimSpace(route)
 
@@ -232,4 +237,16 @@ func SetDictionary(dict map[string]uint16) {
 		routes[r] = code
 		codes[code] = r
 	}
+
+	return routes, codes
+}
+
+// GetDictionary generates routes and codes from env.RouteDict()
+// Warning: env.RouteDict must be thread-safe func
+func GetDictionary() (map[string]uint16, map[uint16]string) {
+	if env.RouteDict == nil {
+		return Routes, Codes
+	}
+	dict := env.RouteDict()
+	return TransformDictionary(dict)
 }

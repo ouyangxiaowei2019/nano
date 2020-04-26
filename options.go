@@ -8,14 +8,15 @@ import (
 	"github.com/lonng/nano/component"
 	"github.com/lonng/nano/internal/env"
 	"github.com/lonng/nano/internal/log"
-	"github.com/lonng/nano/internal/message"
 	"github.com/lonng/nano/pipeline"
 	"github.com/lonng/nano/serialize"
 	"google.golang.org/grpc"
 )
 
+// Option defines a type for option, an option is a func operate cluster.Options
 type Option func(*cluster.Options)
 
+// WithPipeline set the pipeline option.
 func WithPipeline(pipeline pipeline.Pipeline) Option {
 	return func(opt *cluster.Options) {
 		opt.Pipeline = pipeline
@@ -33,7 +34,7 @@ func WithAdvertiseAddr(addr string, retryInterval ...time.Duration) Option {
 	}
 }
 
-// WithMemberAddr sets the listen address which is used to establish connection between
+// WithClientAddr sets the listen address which is used to establish connection between
 // cluster members. Will select an available port automatically if no member address
 // setting and panic if no available port
 func WithClientAddr(addr string) Option {
@@ -77,27 +78,28 @@ func WithCheckOriginFunc(fn func(*http.Request) bool) Option {
 	}
 }
 
-// WithDebugMode let 'nano' to run under Debug mode.
+// WithDebugMode makes 'nano' run under Debug mode.
 func WithDebugMode() Option {
 	return func(_ *cluster.Options) {
 		env.Debug = true
 	}
 }
 
-// SetDictionary sets routes map
-func WithDictionary(dict map[string]uint16) Option {
+// WithDictionary sets routes map
+func WithDictionary(fn func() map[string]uint16) Option {
 	return func(_ *cluster.Options) {
-		message.SetDictionary(dict)
+		env.RouteDict = fn
 	}
 }
 
+// WithWSPath sets root path for ws
 func WithWSPath(path string) Option {
 	return func(_ *cluster.Options) {
 		env.WSPath = path
 	}
 }
 
-// SetTimerPrecision sets the ticker precision, and time precision can not less
+// WithTimerPrecision sets the ticker precision, and time precision can not less
 // than a Millisecond, and can not change after application running. The default
 // precision is time.Second
 func WithTimerPrecision(precision time.Duration) Option {

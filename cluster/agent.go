@@ -65,7 +65,9 @@ type (
 		pipeline pipeline.Pipeline
 
 		rpcHandler rpcHandler
-		srv        reflect.Value // cached session reflect.Value
+		srv        reflect.Value     // cached session reflect.Value
+		routes     map[string]uint16 // copy system routes for agent
+		codes      map[uint16]string // copy system codes for agent
 	}
 
 	pendingMessage struct {
@@ -78,6 +80,7 @@ type (
 
 // Create new agent instance
 func newAgent(conn net.Conn, pipeline pipeline.Pipeline, rpcHandler rpcHandler) *agent {
+	routes, codes := message.GetDictionary()
 	a := &agent{
 		conn:       conn,
 		state:      statusStart,
@@ -87,6 +90,8 @@ func newAgent(conn net.Conn, pipeline pipeline.Pipeline, rpcHandler rpcHandler) 
 		decoder:    codec.NewDecoder(),
 		pipeline:   pipeline,
 		rpcHandler: rpcHandler,
+		routes:     routes,
+		codes:      codes,
 	}
 
 	// binding session
@@ -296,7 +301,7 @@ func (a *agent) write() {
 				}
 			}
 
-			em, err := m.Encode()
+			em, err := m.Encode(a.routes)
 			if err != nil {
 				log.Println(err.Error())
 				break

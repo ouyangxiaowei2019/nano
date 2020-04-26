@@ -32,23 +32,40 @@ import (
 )
 
 var (
-	Wd          string                   // working path
-	Die         chan bool                // wait for end application
-	Heartbeat   time.Duration            // Heartbeat internal
-	CheckOrigin func(*http.Request) bool // check origin when websocket enabled
-	Debug       bool                     // enable Debug
-	WSPath      string                   // WebSocket path(eg: ws://127.0.0.1/WSPath)
+	// Wd is working path
+	Wd string
 
-	// timerPrecision indicates the precision of timer, default is time.Second
+	// Die waits for end application
+	Die chan bool
+
+	// Heartbeat internal
+	Heartbeat time.Duration
+
+	// CheckOrigin checks origin when websocket enabled
+	CheckOrigin func(*http.Request) bool
+
+	// Debug enables Debug mode
+	Debug bool
+
+	// WSPath is WebSocket path(eg: ws://127.0.0.1/WSPath)
+	WSPath string
+
+	// TimerPrecision indicates the precision of timer, default is time.Second
 	TimerPrecision = time.Second
 
-	// globalTicker represents global ticker that all cron job will be executed
+	// GlobalTicker represents global ticker that all cron job will be executed
 	// in globalTicker.
 	GlobalTicker *time.Ticker
 
+	// Serializer is message serializer, json or protobuf
 	Serializer serialize.Serializer
 
+	// GrpcOptions is options for grpc
 	GrpcOptions = []grpc.DialOption{grpc.WithInsecure()}
+
+	// RouteDict returns message dict from env.Route
+	// Warning: env.RouteDict must be thread-safe func
+	RouteDict func() map[string]uint16
 )
 
 func init() {
