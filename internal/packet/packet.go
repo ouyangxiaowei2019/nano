@@ -30,6 +30,7 @@ type Type byte
 
 const (
 	_ Type = iota
+
 	// Handshake represents a handshake: request(client) <====> handshake response(server)
 	Handshake = 0x01
 

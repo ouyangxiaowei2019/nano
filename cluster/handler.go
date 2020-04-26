@@ -269,11 +269,6 @@ func (h *LocalHandler) processPacket(agent *agent, p *packet.Packet) error {
 		}
 
 	case packet.Data:
-		if agent.status() < statusWorking {
-			return fmt.Errorf("receive data on socket which not yet ACK, session will be closed immediately, remote=%s",
-				agent.conn.RemoteAddr().String())
-		}
-
 		msg, err := message.Decode(p.Data, agent.codes)
 		if err != nil {
 			return err

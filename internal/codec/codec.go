@@ -24,6 +24,7 @@ import (
 	"bytes"
 	"errors"
 
+	"github.com/lonng/nano/internal/env"
 	"github.com/lonng/nano/internal/packet"
 )
 
@@ -53,11 +54,17 @@ func NewDecoder() *Decoder {
 
 func (c *Decoder) forward() error {
 	header := c.buf.Next(HeadLength)
-	c.typ = header[0]
-	if c.typ < packet.Handshake || c.typ > packet.Kick {
-		return packet.ErrWrongPacketType
+
+	if env.ControlPacket {
+		c.typ = header[0]
+		if c.typ < packet.Handshake || c.typ > packet.Kick {
+			return packet.ErrWrongPacketType
+		}
+		c.size = bytesToInt(header[1:])
+	} else {
+		c.typ = byte(packet.Data)
+		c.size = bytesToInt(header[:])
 	}
-	c.size = bytesToInt(header[1:])
 
 	// packet length limitation
 	if c.size > MaxPacketSize {
@@ -117,12 +124,16 @@ func Encode(typ packet.Type, data []byte) ([]byte, error) {
 	if typ < packet.Handshake || typ > packet.Kick {
 		return nil, packet.ErrWrongPacketType
 	}
-
 	p := &packet.Packet{Type: typ, Length: len(data)}
 	buf := make([]byte, p.Length+HeadLength)
-	buf[0] = byte(p.Type)
 
-	copy(buf[1:HeadLength], intToBytes(p.Length))
+	if env.ControlPacket {
+		buf[0] = byte(p.Type)
+		copy(buf[1:HeadLength], intToBytes(p.Length)[1:])
+	} else {
+		copy(buf[:HeadLength], intToBytes(p.Length))
+	}
+
 	copy(buf[HeadLength:], data)
 
 	return buf, nil
@@ -139,9 +150,10 @@ func bytesToInt(b []byte) int {
 
 // Encode packet data length to bytes(Big end)
 func intToBytes(n int) []byte {
-	buf := make([]byte, 3)
-	buf[0] = byte((n >> 16) & 0xFF)
-	buf[1] = byte((n >> 8) & 0xFF)
-	buf[2] = byte(n & 0xFF)
+	buf := make([]byte, 4)
+	buf[0] = byte((n >> 24) & 0xFF)
+	buf[1] = byte((n >> 16) & 0xFF)
+	buf[2] = byte((n >> 8) & 0xFF)
+	buf[3] = byte(n & 0xFF)
 	return buf
 }

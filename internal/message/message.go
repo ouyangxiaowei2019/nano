@@ -42,7 +42,7 @@ const (
 )
 
 const (
-	msgRouteCompressMask = 0x01
+	msgRouteCompressMask = 0x08
 	msgTypeMask          = 0x07
 	msgRouteLengthMask   = 0xFF
 	msgHeadLength        = 0x02
@@ -109,14 +109,6 @@ func invalidType(t Type) bool {
 // Encode marshals message to binary format. Different message types is corresponding to
 // different message header, message types is identified by 2-4 bit of flag field. The
 // relationship between message types and message header is presented as follows:
-// ------------------------------------------
-// |   type   |  flag  |       other        |
-// |----------|--------|--------------------|
-// | request  |----000-|<message id>|<route>|
-// | notify   |----001-|<route>             |
-// | response |----010-|<message id>        |
-// | push     |----011-|<route>             |
-// ------------------------------------------
 // The figure above indicates that the bit does not affect the type of message.
 // See ref: https://github.com/lonnng/nano/blob/master/docs/communication_protocol.md
 func Encode(m *Message, routes map[string]uint16) ([]byte, error) {
@@ -125,26 +117,24 @@ func Encode(m *Message, routes map[string]uint16) ([]byte, error) {
 	}
 
 	buf := make([]byte, 0)
-	flag := byte(m.Type) << 1
+	flag := byte(m.Type)
 
 	code, compressed := routes[m.Route]
-	if compressed {
+	if !compressed {
 		flag |= msgRouteCompressMask
 	}
 	buf = append(buf, flag)
 
-	if m.Type == Request || m.Type == Response {
-		n := m.ID
-		// variant length encode
-		for {
-			b := byte(n % 128)
-			n >>= 7
-			if n != 0 {
-				buf = append(buf, b+128)
-			} else {
-				buf = append(buf, b)
-				break
-			}
+	n := m.ID
+	// variant length encode
+	for {
+		b := byte(n % 128)
+		n >>= 7
+		if n != 0 {
+			buf = append(buf, b+128)
+		} else {
+			buf = append(buf, b)
+			break
 		}
 	}
 
@@ -171,30 +161,28 @@ func Decode(data []byte, codes map[uint16]string) (*Message, error) {
 	m := New()
 	flag := data[0]
 	offset := 1
-	m.Type = Type((flag >> 1) & msgTypeMask)
+	m.Type = Type(flag & msgTypeMask)
 
 	if invalidType(m.Type) {
 		return nil, ErrWrongMessageType
 	}
 
-	if m.Type == Request || m.Type == Response {
-		id := uint64(0)
-		// little end byte order
-		// WARNING: must can be stored in 64 bits integer
-		// variant length encode
-		for i := offset; i < len(data); i++ {
-			b := data[i]
-			id += uint64(b&0x7F) << uint64(7*(i-offset))
-			if b < 128 {
-				offset = i + 1
-				break
-			}
+	id := uint64(0)
+	// little end byte order
+	// WARNING: must can be stored in 64 bits integer
+	// variant length encode
+	for i := offset; i < len(data); i++ {
+		b := data[i]
+		id += uint64(b&0x7F) << uint64(7*(i-offset))
+		if b < 128 {
+			offset = i + 1
+			break
 		}
-		m.ID = id
 	}
+	m.ID = id
 
 	if routable(m.Type) {
-		if flag&msgRouteCompressMask == 1 {
+		if flag&msgRouteCompressMask == 0 {
 			m.compressed = true
 			code := binary.BigEndian.Uint16(data[offset:(offset + 2)])
 			route, ok := codes[code]

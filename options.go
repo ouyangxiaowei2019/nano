@@ -147,3 +147,10 @@ func WithLogger(l log.Logger) Option {
 		log.SetLogger(l)
 	}
 }
+
+// WithEnableControlPacket indicates whether packets use control feature
+func WithEnableControlPacket(enable bool) Option {
+	return func(opt *cluster.Options) {
+		env.ControlPacket = enable
+	}
+}

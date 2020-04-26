@@ -66,6 +66,10 @@ var (
 	// RouteDict returns message dict from env.Route
 	// Warning: env.RouteDict must be thread-safe func
 	RouteDict func() map[string]uint16
+
+	// ControlPacket is a bool that open or close packet control functions.
+	// Control packets include Handshake, HandshakeAck etc...
+	ControlPacket bool
 )
 
 func init() {

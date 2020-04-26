@@ -201,8 +201,6 @@ func (c *Connector) sendMessage(msg *message.Message) error {
 		return err
 	}
 
-	//log.Printf("%+v",msg)
-
 	payload, err := codec.Encode(packet.Data, data)
 	if err != nil {
 		return err
