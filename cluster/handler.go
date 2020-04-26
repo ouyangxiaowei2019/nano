@@ -273,7 +273,7 @@ func (h *LocalHandler) processPacket(agent *agent, p *packet.Packet) error {
 		if err != nil {
 			return err
 		}
-		h.processMessage(agent, msg)
+		h.processMessage(agent.session, msg, false)
 
 	case packet.Heartbeat:
 		// expected
@@ -358,7 +358,7 @@ func (h *LocalHandler) remoteProcess(session *session.Session, msg *message.Mess
 	}
 }
 
-func (h *LocalHandler) processMessage(agent *agent, msg *message.Message) {
+func (h *LocalHandler) processMessage(s *session.Session, msg *message.Message, noCopy bool) {
 	var lastMid uint64
 	switch msg.Type {
 	case message.Request:
@@ -372,9 +372,9 @@ func (h *LocalHandler) processMessage(agent *agent, msg *message.Message) {
 
 	handler, found := h.localHandlers[msg.Route]
 	if !found {
-		h.remoteProcess(agent.session, msg, false)
+		h.remoteProcess(s, msg, noCopy)
 	} else {
-		h.localProcess(handler, lastMid, agent.session, msg)
+		h.localProcess(handler, lastMid, s, msg)
 	}
 }
 
