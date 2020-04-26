@@ -37,7 +37,7 @@ func (w *World) Init() {
 func (w *World) Enter(s *session.Session, msg []byte) error {
 	w.Add(s)
 	log.Println(fmt.Sprintf("session count: %d", w.Count()))
-	return s.Response(&protocol.EnterWorldResponse{ID: s.ID()})
+	return s.Response("OnEnterWorldResponse", &protocol.EnterWorldResponse{ID: s.ID()})
 }
 
 // Update refresh tadpole's position

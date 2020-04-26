@@ -23,7 +23,7 @@ func (m *Manager) Login(s *session.Session, msg *protocol.JoyLoginRequest) error
 	log.Println(msg)
 	id := s.ID()
 	s.Bind(id)
-	return s.Response(protocol.LoginResponse{
+	return s.Response("OnLoginResponse", protocol.LoginResponse{
 		Status: protocol.LoginStatusSucc,
 		ID:     id,
 	})

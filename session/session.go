@@ -35,8 +35,8 @@ type NetworkEntity interface {
 	Push(route string, v interface{}) error
 	RPC(route string, v interface{}) error
 	LastMid() uint64
-	Response(v interface{}) error
-	ResponseMid(mid uint64, v interface{}) error
+	Response(route string, v interface{}) error
+	ResponseMid(mid uint64, route string, v interface{}) error
 	Close() error
 	RemoteAddr() net.Addr
 }
@@ -93,14 +93,14 @@ func (s *Session) Push(route string, v interface{}) error {
 }
 
 // Response message to client
-func (s *Session) Response(v interface{}) error {
-	return s.entity.Response(v)
+func (s *Session) Response(route string, v interface{}) error {
+	return s.entity.Response(route, v)
 }
 
 // ResponseMID responses message to client, mid is
 // request message ID
-func (s *Session) ResponseMID(mid uint64, v interface{}) error {
-	return s.entity.ResponseMid(mid, v)
+func (s *Session) ResponseMID(mid uint64, route string, v interface{}) error {
+	return s.entity.ResponseMid(mid, route, v)
 }
 
 // ID returns the session id

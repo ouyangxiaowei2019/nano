@@ -29,12 +29,15 @@ It has these top-level messages:
 */
 package clusterpb
 
-import proto "github.com/golang/protobuf/proto"
-import fmt "fmt"
-import math "math"
-
 import (
+	fmt "fmt"
+
+	proto "github.com/golang/protobuf/proto"
+
+	math "math"
+
 	context "golang.org/x/net/context"
+
 	grpc "google.golang.org/grpc"
 )
 
@@ -228,7 +231,8 @@ func (m *NotifyMessage) GetData() []byte {
 type ResponseMessage struct {
 	SessionId int64  `protobuf:"varint,1,opt,name=sessionId" json:"sessionId"`
 	Id        uint64 `protobuf:"varint,2,opt,name=id" json:"id"`
-	Data      []byte `protobuf:"bytes,3,opt,name=data,proto3" json:"data"`
+	Route     string `protobuf:"bytes,3,opt,name=route" json:"route"`
+	Data      []byte `protobuf:"bytes,4,opt,name=data,proto3" json:"data"`
 }
 
 func (m *ResponseMessage) Reset()                    { *m = ResponseMessage{} }
@@ -248,6 +252,13 @@ func (m *ResponseMessage) GetId() uint64 {
 		return m.Id
 	}
 	return 0
+}
+
+func (m *ResponseMessage) GetRoute() string {
+	if m != nil {
+		return m.Route
+	}
+	return ""
 }
 
 func (m *ResponseMessage) GetData() []byte {

@@ -163,13 +163,13 @@ func (a *agent) RPC(route string, v interface{}) error {
 
 // Response, implementation for session.NetworkEntity interface
 // Response message to session
-func (a *agent) Response(v interface{}) error {
-	return a.ResponseMid(a.lastMid, v)
+func (a *agent) Response(route string, v interface{}) error {
+	return a.ResponseMid(a.lastMid, route, v)
 }
 
 // ResponseMid, implementation for session.NetworkEntity interface
 // Response message to session
-func (a *agent) ResponseMid(mid uint64, v interface{}) error {
+func (a *agent) ResponseMid(mid uint64, route string, v interface{}) error {
 	if a.status() == statusClosed {
 		return ErrBrokenPipe
 	}
@@ -185,15 +185,15 @@ func (a *agent) ResponseMid(mid uint64, v interface{}) error {
 	if env.Debug {
 		switch d := v.(type) {
 		case []byte:
-			log.Println(fmt.Sprintf("Type=Response, ID=%d, UID=%d, MID=%d, Data=%dbytes",
-				a.session.ID(), a.session.UID(), mid, len(d)))
+			log.Println(fmt.Sprintf("Type=Response, ID=%d, UID=%d, Route=%s, MID=%d,  Data=%dbytes",
+				a.session.ID(), a.session.UID(), route, mid, len(d)))
 		default:
-			log.Println(fmt.Sprintf("Type=Response, ID=%d, UID=%d, MID=%d, Data=%+v",
-				a.session.ID(), a.session.UID(), mid, v))
+			log.Println(fmt.Sprintf("Type=Response, ID=%d, UID=%d, Route=%s, MID=%d, Route=%s, Data=%+v",
+				a.session.ID(), a.session.UID(), route, mid, v))
 		}
 	}
 
-	return a.send(pendingMessage{typ: message.Response, mid: mid, payload: v})
+	return a.send(pendingMessage{typ: message.Response, route: route, mid: mid, payload: v})
 }
 
 // Close, implementation for session.NetworkEntity interface
