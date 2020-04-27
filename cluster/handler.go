@@ -39,7 +39,6 @@ import (
 	"github.com/lonng/nano/internal/message"
 	"github.com/lonng/nano/internal/packet"
 	"github.com/lonng/nano/pipeline"
-	"github.com/lonng/nano/scheduler"
 	"github.com/lonng/nano/session"
 )
 
@@ -393,22 +392,10 @@ func (h *LocalHandler) localProcess(handler *component.Handler, lastMid uint64, 
 	}
 
 	// A message can be dispatch to global thread or a user customized thread
-	service := msg.Route[:index]
-	if s, found := h.localServices[service]; found && s.SchedName != "" {
-		sched := session.Value(s.SchedName)
-		if sched == nil {
-			log.Println(fmt.Sprintf("nanl/handler: cannot found `schedular.LocalScheduler` by %s", s.SchedName))
-			return
-		}
-
-		local, ok := sched.(scheduler.LocalScheduler)
-		if !ok {
-			log.Println(fmt.Sprintf("nanl/handler: Type %T does not implement the `schedular.LocalScheduler` interface",
-				sched))
-			return
-		}
-		local.Schedule(task)
-	} else {
-		scheduler.PushTask(task)
+	serviceName := msg.Route[:index]
+	service, found := h.localServices[serviceName]
+	if !found {
+		log.Println(fmt.Sprintf("Service not found: %+v", serviceName))
 	}
+	service.Schedule(session, task)
 }

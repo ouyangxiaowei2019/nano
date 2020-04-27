@@ -116,6 +116,7 @@ func (n *Node) Startup() error {
 	return nil
 }
 
+// Handler returns localhandler for this node.
 func (n *Node) Handler() *LocalHandler {
 	return n.handler
 }
@@ -185,7 +186,7 @@ func (n *Node) initNode() error {
 	return nil
 }
 
-// Shutdowns all components registered by application, that
+// Shutdown all components registered by application, that
 // call by reverse order against register
 func (n *Node) Shutdown() {
 	// reverse call `BeforeShutdown` hooks
@@ -323,6 +324,7 @@ func (n *Node) findOrCreateSession(sid int64, gateAddr string) (*session.Session
 	return s, nil
 }
 
+// HandleRequest is called by grpc `HandleRequest`
 func (n *Node) HandleRequest(_ context.Context, req *clusterpb.RequestMessage) (*clusterpb.MemberHandleResponse, error) {
 	handler, found := n.handler.localHandlers[req.Route]
 	if !found {
@@ -342,6 +344,7 @@ func (n *Node) HandleRequest(_ context.Context, req *clusterpb.RequestMessage) (
 	return &clusterpb.MemberHandleResponse{}, nil
 }
 
+// HandleNotify is called by grpc `HandleNotify`
 func (n *Node) HandleNotify(_ context.Context, req *clusterpb.NotifyMessage) (*clusterpb.MemberHandleResponse, error) {
 	handler, found := n.handler.localHandlers[req.Route]
 	if !found {
@@ -360,6 +363,7 @@ func (n *Node) HandleNotify(_ context.Context, req *clusterpb.NotifyMessage) (*c
 	return &clusterpb.MemberHandleResponse{}, nil
 }
 
+// HandlePush is called by grpc `HandlePush`
 func (n *Node) HandlePush(_ context.Context, req *clusterpb.PushMessage) (*clusterpb.MemberHandleResponse, error) {
 	s := n.findSession(req.SessionId)
 	if s == nil {
@@ -368,6 +372,7 @@ func (n *Node) HandlePush(_ context.Context, req *clusterpb.PushMessage) (*clust
 	return &clusterpb.MemberHandleResponse{}, s.Push(req.Route, req.Data)
 }
 
+// HandleResponse is called by grpc `HandleResponse`
 func (n *Node) HandleResponse(_ context.Context, req *clusterpb.ResponseMessage) (*clusterpb.MemberHandleResponse, error) {
 	s := n.findSession(req.SessionId)
 	if s == nil {
@@ -376,12 +381,14 @@ func (n *Node) HandleResponse(_ context.Context, req *clusterpb.ResponseMessage)
 	return &clusterpb.MemberHandleResponse{}, s.ResponseMID(req.Id, req.Route, req.Data)
 }
 
+// NewMember is called by grpc `NewMember`
 func (n *Node) NewMember(_ context.Context, req *clusterpb.NewMemberRequest) (*clusterpb.NewMemberResponse, error) {
 	n.handler.addRemoteService(req.MemberInfo)
 	n.cluster.addMember(req.MemberInfo)
 	return &clusterpb.NewMemberResponse{}, nil
 }
 
+// DelMember is called by grpc `DelMember`
 func (n *Node) DelMember(_ context.Context, req *clusterpb.DelMemberRequest) (*clusterpb.DelMemberResponse, error) {
 	n.handler.delMember(req.ServiceAddr)
 	n.cluster.delMember(req.ServiceAddr)

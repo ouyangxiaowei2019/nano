@@ -28,17 +28,13 @@ import (
 
 	"github.com/lonng/nano/internal/env"
 	"github.com/lonng/nano/internal/log"
+	"github.com/lonng/nano/session"
 )
 
 const (
 	messageQueueBacklog = 1 << 10
 	sessionCloseBacklog = 1 << 8
 )
-
-// LocalScheduler schedules task to a customized goroutine
-type LocalScheduler interface {
-	Schedule(Task)
-}
 
 type Task func()
 
@@ -61,6 +57,7 @@ func try(f func()) {
 	f()
 }
 
+// Sched pops tasks from
 func Sched() {
 	if atomic.AddInt32(&started, 1) != 1 {
 		return
@@ -86,6 +83,7 @@ func Sched() {
 	}
 }
 
+// Close closes scheduler.
 func Close() {
 	if atomic.AddInt32(&closed, 1) != 1 {
 		return
@@ -95,6 +93,12 @@ func Close() {
 	log.Println("Scheduler stopped")
 }
 
+// Schedule is to fill the default func for Service.Schedule
+func Schedule(session *session.Session, task Task) {
+	PushTask(task)
+}
+
+// PushTask pushes task in task channel
 func PushTask(task Task) {
 	chTasks <- task
 }

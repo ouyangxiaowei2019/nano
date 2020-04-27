@@ -23,6 +23,9 @@ package component
 import (
 	"errors"
 	"reflect"
+
+	"github.com/lonng/nano/scheduler"
+	"github.com/lonng/nano/session"
 )
 
 type (
@@ -38,15 +41,16 @@ type (
 	// Service implements a specific service, some of it's methods will be
 	// called when the correspond events is occurred.
 	Service struct {
-		Name      string              // name of service
-		Type      reflect.Type        // type of the receiver
-		Receiver  reflect.Value       // receiver of methods for the service
-		Handlers  map[string]*Handler // registered methods
-		SchedName string              // name of scheduler variable in session data
-		Options   options             // options
+		Name     string                                        // name of service
+		Type     reflect.Type                                  // type of the receiver
+		Receiver reflect.Value                                 // receiver of methods for the service
+		Handlers map[string]*Handler                           // registered methods
+		Schedule func(s *session.Session, task scheduler.Task) // name of scheduler variable in session data
+		Options  options                                       // options
 	}
 )
 
+// NewService create a new Service from component
 func NewService(comp Component, opts []Option) *Service {
 	s := &Service{
 		Type:     reflect.TypeOf(comp),
@@ -63,7 +67,11 @@ func NewService(comp Component, opts []Option) *Service {
 	} else {
 		s.Name = reflect.Indirect(s.Receiver).Type().Name()
 	}
-	s.SchedName = s.Options.schedName
+	if s.Options.schedule != nil {
+		s.Schedule = s.Options.schedule
+	} else {
+		s.Schedule = scheduler.Schedule
+	}
 
 	return s
 }
@@ -81,8 +89,8 @@ func (s *Service) suitableHandlerMethods(typ reflect.Type) map[string]*Handler {
 				raw = true
 			}
 			// rewrite handler name
-			if s.Options.nameFunc != nil {
-				mn = s.Options.nameFunc(mn)
+			if s.Options.rewriteHandlerName != nil {
+				mn = s.Options.rewriteHandlerName(mn)
 			}
 			methods[mn] = &Handler{Method: method, Type: mt.In(2), IsRawArg: raw}
 		}

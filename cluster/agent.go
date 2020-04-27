@@ -215,7 +215,7 @@ func (a *agent) Close() error {
 		// expect
 	default:
 		close(a.chDie)
-		scheduler.PushTask(func() { session.Lifetime.Close(a.session) })
+		scheduler.Schedule(a.session, func() { session.Lifetime.Close(a.session) })
 	}
 
 	return a.conn.Close()
