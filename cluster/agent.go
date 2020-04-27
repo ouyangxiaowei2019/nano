@@ -290,7 +290,7 @@ func (a *agent) write() {
 				}
 			}
 
-			em, err := m.Encode(a.routes)
+			em, err := message.Encode(m, a.routes)
 			if err != nil {
 				log.Println(err.Error())
 				break

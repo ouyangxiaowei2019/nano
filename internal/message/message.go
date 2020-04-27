@@ -92,11 +92,6 @@ func (m *Message) String() string {
 	return fmt.Sprintf("%s %s (%dbytes)", types[m.Type], m.Route, len(m.Data))
 }
 
-// Encode marshals message to binary format.
-func (m *Message) Encode(routes map[string]uint16) ([]byte, error) {
-	return Encode(m, routes)
-}
-
 func routable(t Type) bool {
 	return t == Request || t == Notify || t == Push
 }
@@ -153,7 +148,6 @@ func Encode(m *Message, routes map[string]uint16) ([]byte, error) {
 }
 
 // Decode unmarshal the bytes slice to a message
-// See ref: https://github.com/lonnng/nano/blob/master/docs/communication_protocol.md
 func Decode(data []byte, codes map[uint16]string) (*Message, error) {
 	if len(data) < msgHeadLength {
 		return nil, ErrInvalidMessage

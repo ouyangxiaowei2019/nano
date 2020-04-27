@@ -229,7 +229,6 @@ func (h *LocalHandler) handle(conn net.Conn) {
 }
 
 func (h *LocalHandler) processPacket(agent *agent, p *packet.Packet) error {
-	agent.setStatus(statusWorking)
 	msg, err := message.Decode(p.Data, agent.codes)
 	if err != nil {
 		return err
