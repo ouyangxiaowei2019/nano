@@ -87,7 +87,6 @@ func (n *Node) Startup() error {
 		}
 	}
 
-	cache()
 	if err := n.initNode(); err != nil {
 		return err
 	}

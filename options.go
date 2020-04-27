@@ -64,13 +64,6 @@ func WithComponents(components *component.Components) Option {
 	}
 }
 
-// WithHeartbeatInterval sets Heartbeat time interval
-func WithHeartbeatInterval(d time.Duration) Option {
-	return func(_ *cluster.Options) {
-		env.Heartbeat = d
-	}
-}
-
 // WithCheckOriginFunc sets the function that check `Origin` in http headers
 func WithCheckOriginFunc(fn func(*http.Request) bool) Option {
 	return func(opt *cluster.Options) {
@@ -145,12 +138,5 @@ func WithTSLConfig(certificate, key string) Option {
 func WithLogger(l log.Logger) Option {
 	return func(opt *cluster.Options) {
 		log.SetLogger(l)
-	}
-}
-
-// WithEnableControlPacket indicates whether packets use control feature
-func WithEnableControlPacket(enable bool) Option {
-	return func(opt *cluster.Options) {
-		env.ControlPacket = enable
 	}
 }

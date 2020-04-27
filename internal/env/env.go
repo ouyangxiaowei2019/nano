@@ -38,9 +38,6 @@ var (
 	// Die waits for end application
 	Die chan bool
 
-	// Heartbeat internal
-	Heartbeat time.Duration
-
 	// CheckOrigin checks origin when websocket enabled
 	CheckOrigin func(*http.Request) bool
 
@@ -66,15 +63,10 @@ var (
 	// RouteDict returns message dict from env.Route
 	// Warning: env.RouteDict must be thread-safe func
 	RouteDict func() map[string]uint16
-
-	// ControlPacket is a bool that open or close packet control functions.
-	// Control packets include Handshake, HandshakeAck etc...
-	ControlPacket bool
 )
 
 func init() {
 	Die = make(chan bool)
-	Heartbeat = 30 * time.Second
 	Debug = false
 	CheckOrigin = func(_ *http.Request) bool { return true }
 	Serializer = protobuf.NewSerializer()

@@ -31,24 +31,6 @@ import (
 	"github.com/lonng/nano/internal/packet"
 )
 
-var (
-	hsd []byte // handshake data
-	had []byte // handshake ack data
-)
-
-func init() {
-	var err error
-	hsd, err = codec.Encode(packet.Handshake, nil)
-	if err != nil {
-		panic(err)
-	}
-
-	had, err = codec.Encode(packet.HandshakeAck, nil)
-	if err != nil {
-		panic(err)
-	}
-}
-
 type (
 
 	// Callback represents the callback type which will be called
@@ -101,9 +83,6 @@ func (c *Connector) Start(addr string) error {
 	c.conn = conn
 
 	go c.write()
-
-	// send handshake packet
-	c.send(hsd)
 
 	// read and process network message
 	go c.read()

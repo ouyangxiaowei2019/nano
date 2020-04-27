@@ -22,7 +22,6 @@ package cluster
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
 	"math/rand"
 	"net"
@@ -35,7 +34,6 @@ import (
 	"github.com/gorilla/websocket"
 	"github.com/lonng/nano/cluster/clusterpb"
 	"github.com/lonng/nano/component"
-	"github.com/lonng/nano/internal/codec"
 	"github.com/lonng/nano/internal/env"
 	"github.com/lonng/nano/internal/log"
 	"github.com/lonng/nano/internal/message"
@@ -52,26 +50,6 @@ var (
 )
 
 type rpcHandler func(session *session.Session, msg *message.Message, noCopy bool)
-
-func cache() {
-	data, err := json.Marshal(map[string]interface{}{
-		"code": 200,
-		"sys":  map[string]float64{"heartbeat": env.Heartbeat.Seconds()},
-	})
-	if err != nil {
-		panic(err)
-	}
-
-	hrd, err = codec.Encode(packet.Handshake, data)
-	if err != nil {
-		panic(err)
-	}
-
-	hbd, err = codec.Encode(packet.Heartbeat, nil)
-	if err != nil {
-		panic(err)
-	}
-}
 
 type LocalHandler struct {
 	localServices map[string]*component.Service // all registered service
@@ -251,33 +229,12 @@ func (h *LocalHandler) handle(conn net.Conn) {
 }
 
 func (h *LocalHandler) processPacket(agent *agent, p *packet.Packet) error {
-	switch p.Type {
-	case packet.Handshake:
-		if _, err := agent.conn.Write(hrd); err != nil {
-			return err
-		}
-
-		agent.setStatus(statusHandshake)
-		if env.Debug {
-			log.Println(fmt.Sprintf("Session handshake Id=%d, Remote=%s", agent.session.ID(), agent.conn.RemoteAddr()))
-		}
-
-	case packet.HandshakeAck:
-		agent.setStatus(statusWorking)
-		if env.Debug {
-			log.Println(fmt.Sprintf("Receive handshake ACK Id=%d, Remote=%s", agent.session.ID(), agent.conn.RemoteAddr()))
-		}
-
-	case packet.Data:
-		msg, err := message.Decode(p.Data, agent.codes)
-		if err != nil {
-			return err
-		}
-		h.processMessage(agent.session, msg, false)
-
-	case packet.Heartbeat:
-		// expected
+	agent.setStatus(statusWorking)
+	msg, err := message.Decode(p.Data, agent.codes)
+	if err != nil {
+		return err
 	}
+	h.processMessage(agent.session, msg, false)
 
 	agent.lastAt = time.Now().Unix()
 	return nil

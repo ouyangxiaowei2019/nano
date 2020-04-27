@@ -24,7 +24,6 @@ import (
 	"bytes"
 	"errors"
 
-	"github.com/lonng/nano/internal/env"
 	"github.com/lonng/nano/internal/packet"
 )
 
@@ -40,8 +39,7 @@ var ErrPacketSizeExcced = errors.New("codec: packet size exceed")
 // A Decoder reads and decodes network data slice
 type Decoder struct {
 	buf  *bytes.Buffer
-	size int  // last packet length
-	typ  byte // last packet type
+	size int // last packet length
 }
 
 // NewDecoder returns a new decoder that used for decode network bytes slice.
@@ -54,17 +52,7 @@ func NewDecoder() *Decoder {
 
 func (c *Decoder) forward() error {
 	header := c.buf.Next(HeadLength)
-
-	if env.ControlPacket {
-		c.typ = header[0]
-		if c.typ < packet.Handshake || c.typ > packet.Kick {
-			return packet.ErrWrongPacketType
-		}
-		c.size = bytesToInt(header[1:])
-	} else {
-		c.typ = byte(packet.Data)
-		c.size = bytesToInt(header[:])
-	}
+	c.size = bytesToInt(header[:])
 
 	// packet length limitation
 	if c.size > MaxPacketSize {
@@ -95,7 +83,7 @@ func (c *Decoder) Decode(data []byte) ([]*packet.Packet, error) {
 	}
 
 	for c.size <= c.buf.Len() {
-		p := &packet.Packet{Type: packet.Type(c.typ), Length: c.size, Data: c.buf.Next(c.size)}
+		p := &packet.Packet{Length: c.size, Data: c.buf.Next(c.size)}
 		packets = append(packets, p)
 
 		// more packet
@@ -120,20 +108,11 @@ func (c *Decoder) Decode(data []byte) ([]*packet.Packet, error) {
 // -<type>-|--------<length>--------|-<data>-
 // --------|------------------------|--------
 // 1 byte packet type, 3 bytes packet data length(big end), and data segment
-func Encode(typ packet.Type, data []byte) ([]byte, error) {
-	if typ < packet.Handshake || typ > packet.Kick {
-		return nil, packet.ErrWrongPacketType
-	}
-	p := &packet.Packet{Type: typ, Length: len(data)}
+func Encode(data []byte) ([]byte, error) {
+	p := &packet.Packet{Length: len(data)}
 	buf := make([]byte, p.Length+HeadLength)
 
-	if env.ControlPacket {
-		buf[0] = byte(p.Type)
-		copy(buf[1:HeadLength], intToBytes(p.Length)[1:])
-	} else {
-		copy(buf[:HeadLength], intToBytes(p.Length))
-	}
-
+	copy(buf[:HeadLength], intToBytes(p.Length))
 	copy(buf[HeadLength:], data)
 
 	return buf, nil

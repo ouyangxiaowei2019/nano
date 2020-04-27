@@ -32,7 +32,6 @@ import (
 	"github.com/lonng/nano/internal/env"
 	"github.com/lonng/nano/internal/log"
 	"github.com/lonng/nano/internal/message"
-	"github.com/lonng/nano/internal/packet"
 	"github.com/lonng/nano/pipeline"
 	"github.com/lonng/nano/scheduler"
 	"github.com/lonng/nano/session"
@@ -242,11 +241,9 @@ func (a *agent) setStatus(state int32) {
 }
 
 func (a *agent) write() {
-	ticker := time.NewTicker(env.Heartbeat)
 	chWrite := make(chan []byte, agentWriteBacklog)
 	// clean func
 	defer func() {
-		ticker.Stop()
 		close(a.chSend)
 		close(chWrite)
 		a.Close()
@@ -257,18 +254,6 @@ func (a *agent) write() {
 
 	for {
 		select {
-		case <-ticker.C:
-			deadline := time.Now().Add(-2 * env.Heartbeat).Unix()
-			if atomic.LoadInt64(&a.lastAt) < deadline {
-				log.Println(fmt.Sprintf("Session heartbeat timeout, LastTime=%d, Deadline=%d", atomic.LoadInt64(&a.lastAt), deadline))
-				return
-			}
-
-			// If ControlPacket is enabled, it needs to write hbd.
-			if env.ControlPacket {
-				chWrite <- hbd
-			}
-
 		case data := <-chWrite:
 			// close agent while low-level conn broken
 			if _, err := a.conn.Write(data); err != nil {
@@ -312,7 +297,7 @@ func (a *agent) write() {
 			}
 
 			// packet encode
-			p, err := codec.Encode(packet.Data, em)
+			p, err := codec.Encode(em)
 			if err != nil {
 				log.Println(err)
 				break
