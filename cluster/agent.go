@@ -187,7 +187,7 @@ func (a *agent) ResponseMid(mid uint64, route string, v interface{}) error {
 			log.Println(fmt.Sprintf("Type=Response, ID=%d, UID=%d, Route=%s, MID=%d,  Data=%dbytes",
 				a.session.ID(), a.session.UID(), route, mid, len(d)))
 		default:
-			log.Println(fmt.Sprintf("Type=Response, ID=%d, UID=%d, Route=%s, MID=%d, Route=%s, Data=%+v",
+			log.Println(fmt.Sprintf("Type=Response, ID=%d, UID=%d, Route=%s, MID=%d, Data=%+v",
 				a.session.ID(), a.session.UID(), route, mid, v))
 		}
 	}

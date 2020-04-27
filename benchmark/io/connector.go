@@ -84,8 +84,9 @@ func (c *Connector) Start(addr string) error {
 
 	go c.write()
 
-	// read and process network message
 	go c.read()
+
+	c.connectedCallback()
 
 	return nil
 }
@@ -175,12 +176,12 @@ func (c *Connector) setResponseHandler(mid uint64, cb Callback) {
 }
 
 func (c *Connector) sendMessage(msg *message.Message) error {
-	data, err := msg.Encode(c.routes)
+	data, err := message.Encode(msg, c.routes)
 	if err != nil {
 		return err
 	}
 
-	payload, err := codec.Encode(packet.Data, data)
+	payload, err := codec.Encode(data)
 	if err != nil {
 		return err
 	}
@@ -238,21 +239,13 @@ func (c *Connector) read() {
 }
 
 func (c *Connector) processPacket(p *packet.Packet) {
-	switch p.Type {
-	case packet.Handshake:
-		c.send(had)
-		c.connectedCallback()
-	case packet.Data:
-		msg, err := message.Decode(p.Data, c.codes)
-		if err != nil {
-			log.Println(err.Error())
-			return
-		}
-		c.processMessage(msg)
-
-	case packet.Kick:
-		c.Close()
+	msg, err := message.Decode(p.Data, c.codes)
+	if err != nil {
+		log.Println(err.Error())
+		return
 	}
+	c.processMessage(msg)
+
 }
 
 func (c *Connector) processMessage(msg *message.Message) {

@@ -9,8 +9,8 @@ import (
 
 func TestPack(t *testing.T) {
 	data := []byte("hello world")
-	p1 := &Packet{Type: Handshake, Data: data, Length: len(data)}
-	pp1, err := Encode(Handshake, data)
+	p1 := &Packet{Data: data, Length: len(data)}
+	pp1, err := Encode(data)
 	if err != nil {
 		t.Error(err.Error())
 	}
@@ -27,8 +27,8 @@ func TestPack(t *testing.T) {
 		t.Fatalf("expect: %v, got: %v", p1, packets[0])
 	}
 
-	p2 := &Packet{Type: Type(5), Data: data, Length: len(data)}
-	pp2, err := Encode(Kick, data)
+	p2 := &Packet{Data: data, Length: len(data)}
+	pp2, err := Encode(data)
 	if err != nil {
 		t.Error(err.Error())
 	}
@@ -45,23 +45,23 @@ func TestPack(t *testing.T) {
 		t.Fatalf("expect: %v, got: %v", p2, upp2[0])
 	}
 
-	_ = &Packet{Type: Type(0), Data: data, Length: len(data)}
-	if _, err := Encode(Type(0), data); err == nil {
-		t.Error("should err")
+	_ = &Packet{Data: data, Length: len(data)}
+	if _, err := Encode(data); err != nil {
+		t.Error("cannot be err")
 	}
 
-	_ = &Packet{Type: Type(6), Data: data, Length: len(data)}
-	if _, err = Encode(Type(6), data); err == nil {
-		t.Error("should err")
+	_ = &Packet{Data: data, Length: len(data)}
+	if _, err = Encode(data); err != nil {
+		t.Error("cannot be err")
 	}
 
-	p5 := &Packet{Type: Type(5), Data: data, Length: len(data)}
-	pp5, err := Encode(Kick, data)
+	p5 := &Packet{Data: data, Length: len(data)}
+	pp5, err := Encode(data)
 	if err != nil {
 		t.Fatal(err.Error())
 	}
 	d3 := NewDecoder()
-	upp5, err := d3.Decode(append(pp5, []byte{0x01, 0x00, 0x00, 0x00}...))
+	upp5, err := d3.Decode(append(pp5, []byte{0x00, 0x00, 0x00, 0x00}...))
 	if err != nil {
 		t.Fatal(err.Error())
 	}
@@ -76,7 +76,7 @@ func TestPack(t *testing.T) {
 
 func BenchmarkDecoder_Decode(b *testing.B) {
 	data := []byte("hello world")
-	pp1, err := Encode(Handshake, data)
+	pp1, err := Encode(data)
 	if err != nil {
 		b.Error(err.Error())
 	}

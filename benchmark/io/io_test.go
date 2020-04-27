@@ -47,10 +47,9 @@ func (h *TestHandler) Ping(s *session.Session, data *testdata.Ping) error {
 }
 
 func server() {
-	nano.Register(&TestHandler{})
-	nano.SetSerializer(protobuf.NewSerializer())
-
-	nano.Listen(addr)
+	nano.Listen(addr,
+		nano.WithComponents(&[]component.Components{TestHandler{}})
+		nano.WithSerializer(protobuf.NewSerializer()))
 }
 
 func client() {

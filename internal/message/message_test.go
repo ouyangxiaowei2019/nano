@@ -20,7 +20,7 @@ func TestEncode(t *testing.T) {
 		Data:       []byte(`hello world`),
 		compressed: true,
 	}
-	em1, err := m1.Encode(routes)
+	em1, err := Encode(m1, routes)
 	if err != nil {
 		t.Error(err.Error())
 	}
@@ -39,7 +39,7 @@ func TestEncode(t *testing.T) {
 		Route: "test.test.test4",
 		Data:  []byte(`hello world`),
 	}
-	em2, err := m2.Encode(routes)
+	em2, err := Encode(m2, routes)
 	if err != nil {
 		t.Error(err.Error())
 	}
@@ -57,7 +57,7 @@ func TestEncode(t *testing.T) {
 		ID:   100,
 		Data: []byte(`hello world`),
 	}
-	em3, err := m3.Encode(routes)
+	em3, err := Encode(m3, routes)
 	if err != nil {
 		t.Error(err.Error())
 	}
@@ -75,7 +75,7 @@ func TestEncode(t *testing.T) {
 		ID:   100,
 		Data: []byte(`hello world`),
 	}
-	em4, err := m4.Encode(routes)
+	em4, err := Encode(m4, routes)
 	if err != nil {
 		t.Error(err.Error())
 	}
@@ -94,7 +94,7 @@ func TestEncode(t *testing.T) {
 		Data:       []byte(`hello world`),
 		compressed: true,
 	}
-	em5, err := m5.Encode(routes)
+	em5, err := Encode(m5, routes)
 	if err != nil {
 		t.Error(err.Error())
 	}
@@ -112,7 +112,7 @@ func TestEncode(t *testing.T) {
 		Route: "test.test.test20",
 		Data:  []byte(`hello world`),
 	}
-	em6, err := m6.Encode(routes)
+	em6, err := Encode(m6, routes)
 	if err != nil {
 		t.Error(err.Error())
 	}
@@ -130,7 +130,7 @@ func TestEncode(t *testing.T) {
 		Route: "test.test.test9",
 		Data:  []byte(`hello world`),
 	}
-	em7, err := m7.Encode(routes)
+	em7, err := Encode(m7, routes)
 	if err != nil {
 		t.Error(err.Error())
 	}
@@ -149,7 +149,7 @@ func TestEncode(t *testing.T) {
 		Data:       []byte(`hello world`),
 		compressed: true,
 	}
-	em8, err := m8.Encode(routes)
+	em8, err := Encode(m8, routes)
 	if err != nil {
 		t.Error(err.Error())
 	}
