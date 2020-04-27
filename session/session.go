@@ -58,6 +58,7 @@ type Session struct {
 	entity       NetworkEntity          // low-level network entity
 	data         map[string]interface{} // session data store
 	router       *Router
+	onClosed     []func() // call func in slice when session is closeds
 }
 
 // New returns a new session instance
@@ -77,7 +78,7 @@ func (s *Session) NetworkEntity() NetworkEntity {
 	return s.entity
 }
 
-// NetworkEntity returns the service router
+// Router returns the service router
 func (s *Session) Router() *Router {
 	return s.router
 }
@@ -416,4 +417,16 @@ func (s *Session) Clear() {
 
 	s.uid = 0
 	s.data = map[string]interface{}{}
+}
+
+// OnClosed set a func that will be called on session closed.
+func (s *Session) OnClosed(fn func()) {
+	s.onClosed = append(s.onClosed, fn)
+}
+
+// OnClose call all funcs that was registerd by OnClosed
+func (s *Session) OnClose() {
+	for _, h := range s.onClosed {
+		h()
+	}
 }

@@ -36,9 +36,11 @@ const (
 	sessionCloseBacklog = 1 << 8
 )
 
+// Task is the unit to be scheduled
 type Task func()
 
-type Hook func()
+// SchedFunc is the Func type of schedule
+type SchedFunc func(session *session.Session, task Task)
 
 var (
 	chDie   = make(chan struct{})
@@ -57,8 +59,8 @@ func try(f func()) {
 	f()
 }
 
-// Sched pops tasks from
-func Sched() {
+// Digest pops tasks from task channel, and handle them.
+func Digest() {
 	if atomic.AddInt32(&started, 1) != 1 {
 		return
 	}

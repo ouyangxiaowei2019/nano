@@ -25,7 +25,6 @@ import (
 	"reflect"
 
 	"github.com/lonng/nano/scheduler"
-	"github.com/lonng/nano/session"
 )
 
 type (
@@ -41,12 +40,12 @@ type (
 	// Service implements a specific service, some of it's methods will be
 	// called when the correspond events is occurred.
 	Service struct {
-		Name     string                                        // name of service
-		Type     reflect.Type                                  // type of the receiver
-		Receiver reflect.Value                                 // receiver of methods for the service
-		Handlers map[string]*Handler                           // registered methods
-		Schedule func(s *session.Session, task scheduler.Task) // name of scheduler variable in session data
-		Options  options                                       // options
+		Name     string              // name of service
+		Type     reflect.Type        // type of the receiver
+		Receiver reflect.Value       // receiver of methods for the service
+		Handlers map[string]*Handler // registered methods
+		Schedule scheduler.SchedFunc // tasks are pushed in and wait to be handled
+		Options  options             // options
 	}
 )
 

@@ -402,7 +402,7 @@ func (n *Node) SessionClosed(_ context.Context, req *clusterpb.SessionClosedRequ
 	delete(n.sessions, req.SessionId)
 	n.mu.Unlock()
 	if found {
-		scheduler.PushTask(func() { session.Lifetime.Close(s) })
+		scheduler.PushTask(s.OnClose)
 	}
 	return &clusterpb.SessionClosedResponse{}, nil
 }

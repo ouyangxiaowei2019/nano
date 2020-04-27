@@ -22,14 +22,13 @@ package component
 
 import (
 	"github.com/lonng/nano/scheduler"
-	"github.com/lonng/nano/session"
 )
 
 type (
 	options struct {
-		name               string                                        // component name
-		rewriteHandlerName func(string) string                           // rename handler name
-		schedule           func(s *session.Session, task scheduler.Task) // schedule service task              // schedName name
+		name               string              // component name
+		rewriteHandlerName func(string) string // rename handler name
+		schedule           scheduler.SchedFunc // schedule service task              // schedName name
 	}
 
 	// Option used to customize handler
@@ -52,7 +51,7 @@ func WithRewriteHandlerNameFunc(fn func(string) string) Option {
 }
 
 // WithScheduleFunc set the func of the service schedule
-func WithScheduleFunc(fn func(s *session.Session, task scheduler.Task)) Option {
+func WithScheduleFunc(fn scheduler.SchedFunc) Option {
 	return func(opt *options) {
 		opt.schedule = fn
 	}

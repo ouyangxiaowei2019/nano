@@ -107,7 +107,7 @@ func Listen(addr string, opts ...Option) {
 			app.name, node.ServiceAddr))
 	}
 
-	go scheduler.Sched()
+	go scheduler.Digest()
 	sg := make(chan os.Signal)
 	signal.Notify(sg, syscall.SIGINT, syscall.SIGQUIT, syscall.SIGKILL, syscall.SIGTERM)
 
