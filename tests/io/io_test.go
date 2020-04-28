@@ -7,7 +7,53 @@ import (
 	"syscall"
 	"testing"
 	"time"
+
+	"github.com/lonng/nano"
+	"github.com/lonng/nano/component"
+	"github.com/lonng/nano/connector"
+	"github.com/lonng/nano/serialize/protobuf"
+	"github.com/lonng/nano/tests/io/testdata"
 )
+
+const (
+	addr     = "127.0.0.1:13250" // local address
+	conc     = 1000              // concurrent client count
+	duration = 10                // max test time
+)
+
+var (
+	components component.Components
+)
+
+func client(t *testing.T) {
+	c := connector.NewConnector()
+
+	c.OnConnected(func() {
+		// t.Log("client on connected")
+	})
+
+	if err := c.Start(addr); err != nil {
+		panic(err)
+	}
+
+	c.On("pong", func(data interface{}) {
+		// t.Log("pong received")
+	})
+
+	for {
+		c.Notify("TestHandler.Ping", &testdata.Ping{})
+		// t.Log("ping send")
+		time.Sleep(10 * time.Millisecond)
+	}
+}
+
+func server(t *testing.T) {
+	components.Register(&TestHandler{metrics: 0})
+	nano.Listen(addr,
+		nano.WithComponents(&components),
+		nano.WithSerializer(protobuf.NewSerializer()),
+	)
+}
 
 func TestPingPong(t *testing.T) {
 	go server(t)
@@ -23,5 +69,8 @@ func TestPingPong(t *testing.T) {
 	sg := make(chan os.Signal)
 	signal.Notify(sg, syscall.SIGINT, syscall.SIGQUIT, syscall.SIGKILL)
 
-	<-sg
+	select {
+	case <-time.After(duration * time.Second):
+	case <-sg:
+	}
 }
