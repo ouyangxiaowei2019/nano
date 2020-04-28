@@ -29,6 +29,9 @@ func TestEncode(t *testing.T) {
 		t.Error(err.Error())
 	}
 
+	t.Log("encode:", m1)
+	t.Log("decode:", dm1)
+
 	if !reflect.DeepEqual(m1, dm1) {
 		t.Error("not equal")
 	}
@@ -48,6 +51,9 @@ func TestEncode(t *testing.T) {
 		t.Error(err.Error())
 	}
 
+	t.Log("encode:", m2)
+	t.Log("decode:", dm2)
+
 	if !reflect.DeepEqual(m2, dm2) {
 		t.Error("not equal")
 	}
@@ -66,6 +72,9 @@ func TestEncode(t *testing.T) {
 		t.Error(err.Error())
 	}
 
+	t.Log("encode:", m3)
+	t.Log("decode:", dm3)
+
 	if !reflect.DeepEqual(m3, dm3) {
 		t.Error("not equal")
 	}
@@ -83,6 +92,9 @@ func TestEncode(t *testing.T) {
 	if err != nil {
 		t.Error(err.Error())
 	}
+
+	t.Log("encode:", m4)
+	t.Log("decode:", dm4)
 
 	if !reflect.DeepEqual(m4, dm4) {
 		t.Error("not equal")
@@ -103,6 +115,9 @@ func TestEncode(t *testing.T) {
 		t.Error(err.Error())
 	}
 
+	t.Log("encode:", m5)
+	t.Log("decode:", dm5)
+
 	if !reflect.DeepEqual(m5, dm5) {
 		t.Error("not equal")
 	}
@@ -120,6 +135,9 @@ func TestEncode(t *testing.T) {
 	if err != nil {
 		t.Error(err.Error())
 	}
+
+	t.Log("encode:", m6)
+	t.Log("decode:", dm6)
 
 	if !reflect.DeepEqual(m6, dm6) {
 		t.Error("not equal")
@@ -139,6 +157,9 @@ func TestEncode(t *testing.T) {
 		t.Error(err.Error())
 	}
 
+	t.Log("encode:", m7)
+	t.Log("decode:", dm7)
+
 	if !reflect.DeepEqual(m7, dm7) {
 		t.Error("not equal")
 	}
@@ -157,6 +178,9 @@ func TestEncode(t *testing.T) {
 	if err != nil {
 		t.Error(err.Error())
 	}
+
+	t.Log("encode:", m8)
+	t.Log("decode:", dm8)
 
 	if !reflect.DeepEqual(m8, dm8) {
 		t.Error("not equal")
