@@ -26,9 +26,10 @@ import (
 
 type (
 	options struct {
-		name               string              // component name
-		rewriteHandlerName func(string) string // rename handler name
-		schedule           scheduler.SchedFunc // schedule service task              // schedName name
+		name          string                 // component name
+		renameHandler func(string) string    // rename handler name
+		schedule      scheduler.SchedFunc    // schedule service task
+		dictionary    map[interface{}]uint32 // schedName name
 	}
 
 	// Option used to customize handler
@@ -42,11 +43,11 @@ func WithName(name string) Option {
 	}
 }
 
-// WithRewriteHandlerNameFunc override handler name by specific function
+// WithRenameHandlerFunc override handler name by specific function
 // such as: strings.ToUpper/strings.ToLower
-func WithRewriteHandlerNameFunc(fn func(string) string) Option {
+func WithRenameHandlerFunc(fn func(string) string) Option {
 	return func(opt *options) {
-		opt.rewriteHandlerName = fn
+		opt.renameHandler = fn
 	}
 }
 
@@ -54,5 +55,12 @@ func WithRewriteHandlerNameFunc(fn func(string) string) Option {
 func WithScheduleFunc(fn scheduler.SchedFunc) Option {
 	return func(opt *options) {
 		opt.schedule = fn
+	}
+}
+
+// WithDictionary set dictionary for compressed route
+func WithDictionary(dict map[interface{}]uint32) Option {
+	return func(opt *options) {
+		opt.dictionary = dict
 	}
 }

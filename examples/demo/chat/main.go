@@ -138,7 +138,7 @@ func main() {
 	components.Register(
 		NewRoomManager(),
 		component.WithName("room"), // rewrite component and handler name
-		component.WithRewriteHandlerNameFunc(strings.ToLower),
+		component.WithRenameHandlerFunc(strings.ToLower),
 	)
 
 	// traffic stats

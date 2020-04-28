@@ -79,7 +79,7 @@ type (
 
 // Create new agent instance
 func newAgent(conn net.Conn, pipeline pipeline.Pipeline, rpcHandler rpcHandler) *agent {
-	routes, codes := message.GetDictionary()
+	routes, codes := message.Dictionary()
 	a := &agent{
 		conn:       conn,
 		state:      statusStart,
