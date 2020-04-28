@@ -87,13 +87,6 @@ func NewRoomManager() *RoomManager {
 
 // AfterInit component lifetime callback
 func (mgr *RoomManager) AfterInit() {
-	session.Lifetime.OnClosed(func(s *session.Session) {
-		if !s.HasKey(roomIDKey) {
-			return
-		}
-		room := s.Value(roomIDKey).(*Room)
-		room.group.Leave(s)
-	})
 	mgr.timer = scheduler.NewTimer(time.Minute, func() {
 		for roomId, room := range mgr.rooms {
 			println(fmt.Sprintf("UserCount: RoomID=%d, Time=%s, Count=%d",
@@ -104,6 +97,13 @@ func (mgr *RoomManager) AfterInit() {
 
 // Join room
 func (mgr *RoomManager) Join(s *session.Session, msg []byte) error {
+	s.OnClosed(func() {
+		if !s.HasKey(roomIDKey) {
+			return
+		}
+		room := s.Value(roomIDKey).(*Room)
+		room.group.Leave(s)
+	})
 	// NOTE: join test room only in demo
 	room, found := mgr.rooms[testRoomID]
 	if !found {

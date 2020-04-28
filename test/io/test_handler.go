@@ -5,7 +5,7 @@ import (
 	"time"
 
 	"github.com/lonng/nano/session"
-	"github.com/lonng/nano/tests/io/testdata"
+	"github.com/lonng/nano/test/testdata"
 
 	"github.com/lonng/nano/component"
 )

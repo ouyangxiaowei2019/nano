@@ -25,7 +25,7 @@ func Dictionary() (map[string]uint16, map[uint16]string) {
 
 // SetDictionary is to set dictionary when new route dictionray is found.
 func SetDictionary(dict map[string]uint16) {
-	routes, codes := transform(dict)
+	routes, codes := TransformDictionary(dict)
 
 	rw.Lock()
 	defer rw.Unlock()
@@ -38,8 +38,8 @@ func SetDictionary(dict map[string]uint16) {
 	}
 }
 
-// transform transfroms user defined dict into routes and codes
-func transform(dict map[string]uint16) (map[string]uint16, map[uint16]string) {
+// TransformDictionary transfroms user defined dict into routes and codes
+func TransformDictionary(dict map[string]uint16) (map[string]uint16, map[uint16]string) {
 	routes := make(map[string]uint16)
 	codes := make(map[uint16]string)
 
