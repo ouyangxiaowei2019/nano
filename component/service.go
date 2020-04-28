@@ -88,8 +88,8 @@ func (s *Service) suitableHandlerMethods(typ reflect.Type) map[string]*Handler {
 				raw = true
 			}
 			// rewrite handler name
-			if s.Options.rewriteHandlerName != nil {
-				mn = s.Options.rewriteHandlerName(mn)
+			if s.Options.renameHandler != nil {
+				mn = s.Options.renameHandler(mn)
 			}
 			methods[mn] = &Handler{Method: method, Type: mt.In(2), IsRawArg: raw}
 		}

@@ -78,13 +78,6 @@ func WithDebugMode() Option {
 	}
 }
 
-// WithDictionary sets routes map
-func WithDictionary(fn func() map[string]uint16) Option {
-	return func(_ *cluster.Options) {
-		env.RouteDict = fn
-	}
-}
-
 // WithWSPath sets root path for ws
 func WithWSPath(path string) Option {
 	return func(_ *cluster.Options) {

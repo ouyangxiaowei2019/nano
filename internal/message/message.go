@@ -24,10 +24,6 @@ import (
 	"encoding/binary"
 	"errors"
 	"fmt"
-	"strings"
-
-	"github.com/lonng/nano/internal/env"
-	"github.com/lonng/nano/internal/log"
 )
 
 // Type represents the type of message, which could be Request/Notify/Response/Push
@@ -196,39 +192,4 @@ func Decode(data []byte, codes map[uint16]string) (*Message, error) {
 
 	m.Data = data[offset:]
 	return m, nil
-}
-
-// TransformDictionary transfrom user defined dict into routes and codes
-func TransformDictionary(dict map[string]uint16) (map[string]uint16, map[uint16]string) {
-	routes := make(map[string]uint16)
-	codes := make(map[uint16]string)
-
-	for route, code := range dict {
-		r := strings.TrimSpace(route)
-
-		// duplication check
-		if _, ok := routes[r]; ok {
-			log.Println(fmt.Sprintf("duplicated route(route: %s, code: %d)", r, code))
-		}
-
-		if _, ok := codes[code]; ok {
-			log.Println(fmt.Sprintf("duplicated route(route: %s, code: %d)", r, code))
-		}
-
-		// update map, using last value when key duplicated
-		routes[r] = code
-		codes[code] = r
-	}
-
-	return routes, codes
-}
-
-// GetDictionary generates routes and codes from env.RouteDict()
-// Warning: env.RouteDict must be thread-safe func
-func GetDictionary() (map[string]uint16, map[uint16]string) {
-	if env.RouteDict == nil {
-		return Routes, Codes
-	}
-	dict := env.RouteDict()
-	return TransformDictionary(dict)
 }

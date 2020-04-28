@@ -59,10 +59,6 @@ var (
 
 	// GrpcOptions is options for grpc
 	GrpcOptions = []grpc.DialOption{grpc.WithInsecure()}
-
-	// RouteDict returns message dict from env.Route
-	// Warning: env.RouteDict must be thread-safe func
-	RouteDict func() map[string]uint16
 )
 
 func init() {
