@@ -99,36 +99,36 @@ func Encode(m *Message, routes map[string]uint16) ([]byte, error) {
 	if invalidType(m.Type) {
 		return nil, ErrWrongMessageType
 	}
+	var offset uint64 = 0
+	buf := make([]byte, 11)
 
-	buf := make([]byte, 0)
+	// encode flag
 	flag := byte(m.Type)
-
 	code, compressed := routes[m.Route]
-	if !compressed {
+	if compressed {
 		flag |= msgRouteCompressMask
 	}
 	buf = append(buf, flag)
+	offset++
 
-	n := m.ID
-	// variant length encode
-	for {
-		b := byte(n % 128)
-		n >>= 7
-		if n != 0 {
-			buf = append(buf, b+128)
-		} else {
-			buf = append(buf, b)
-			break
-		}
-	}
+	// encode msg ID
+	binary.BigEndian.PutUint64(buf[offset:], m.ID)
+	offset += 8
 
+	// encode route
 	if routable(m.Type) {
 		if compressed {
-			buf = append(buf, byte((code>>8)&0xFF))
-			buf = append(buf, byte(code&0xFF))
+			// encode compressed route ID
+			binary.BigEndian.PutUint16(buf[offset:], code)
+			offset += 2
 		} else {
-			buf = append(buf, byte(len(m.Route)))
+			rl := len(m.Route)
+			// encode route string length
+			buf = append(buf, byte(rl))
+			offset++
+			// encode route string
 			buf = append(buf, []byte(m.Route)...)
+			offset += uint64(rl)
 		}
 	}
 
@@ -141,32 +141,26 @@ func Decode(data []byte, codes map[uint16]string) (*Message, error) {
 	if len(data) < msgHeadLength {
 		return nil, ErrInvalidMessage
 	}
-	m := New()
-	flag := data[0]
-	offset := 1
-	m.Type = Type(flag & msgTypeMask)
+	var offset uint64 = 0
 
+	// decode flag
+	m := New()
+	flag := data[offset]
+	offset++
+	m.Type = Type(flag & msgTypeMask)
+	m.compressed = flag&msgRouteCompressMask == 1
 	if invalidType(m.Type) {
 		return nil, ErrWrongMessageType
 	}
 
-	id := uint64(0)
-	// little end byte order
-	// WARNING: must can be stored in 64 bits integer
-	// variant length encode
-	for i := offset; i < len(data); i++ {
-		b := data[i]
-		id += uint64(b&0x7F) << uint64(7*(i-offset))
-		if b < 128 {
-			offset = i + 1
-			break
-		}
-	}
-	m.ID = id
+	// decode msg ID
+	m.ID = binary.BigEndian.Uint64(data[offset:])
+	offset += 8
 
+	// decode route
 	if routable(m.Type) {
-		if flag&msgRouteCompressMask == 0 {
-			m.compressed = true
+		if m.compressed {
+			// decode compressed route ID
 			code := binary.BigEndian.Uint16(data[offset:(offset + 2)])
 			route, ok := codes[code]
 			if !ok {
@@ -175,14 +169,17 @@ func Decode(data []byte, codes map[uint16]string) (*Message, error) {
 			m.Route = route
 			offset += 2
 		} else {
-			m.compressed = false
+			// decode route string length
 			rl := data[offset]
 			offset++
-			m.Route = string(data[offset:(offset + int(rl))])
-			offset += int(rl)
+
+			// decode route string
+			m.Route = string(data[offset:(offset + uint64(rl))])
+			offset += uint64(rl)
 		}
 	}
 
+	// decode data
 	m.Data = data[offset:]
 	return m, nil
 }
