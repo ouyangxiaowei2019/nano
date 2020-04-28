@@ -51,13 +51,6 @@ var types = map[Type]string{
 	Push:     "Push",
 }
 
-var (
-	// Routes is default routes for meesage
-	Routes map[string]uint16 = make(map[string]uint16)
-	// Codes is default codes for meesage
-	Codes map[uint16]string = make(map[uint16]string)
-)
-
 func (t Type) String() string {
 	return types[t]
 }

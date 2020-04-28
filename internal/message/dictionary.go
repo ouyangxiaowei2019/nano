@@ -9,9 +9,9 @@ import (
 
 var (
 	// Routes is a map from route to code
-	Routes map[string]uint16
+	Routes = make(map[string]uint16)
 	// Codes is a map from code to route
-	Codes map[uint16]string
+	Codes = make(map[uint16]string)
 	rw    sync.RWMutex
 )
 
