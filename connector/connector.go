@@ -66,7 +66,7 @@ func (c *Connector) Start(addr string) error {
 
 	go c.read()
 
-	c.connectedCallback()
+	go c.connectedCallback()
 
 	return nil
 }

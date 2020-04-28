@@ -28,8 +28,9 @@ var (
 func client(t *testing.T) {
 	c := connector.NewConnector()
 
+	chReady := make(chan struct{})
 	c.OnConnected(func() {
-		// t.Log("client on connected")
+		chReady <- struct{}{}
 	})
 
 	if err := c.Start(addr); err != nil {
@@ -39,7 +40,7 @@ func client(t *testing.T) {
 	c.On("pong", func(data interface{}) {
 		// t.Log("pong received")
 	})
-
+	<-chReady
 	for {
 		c.Notify("TestHandler.Ping", &testdata.Ping{})
 		// t.Log("ping send")
