@@ -24,7 +24,6 @@ import (
 	"errors"
 	"reflect"
 
-	"github.com/lonng/nano/internal/message"
 	"github.com/lonng/nano/scheduler"
 )
 
@@ -47,7 +46,7 @@ type (
 		Handlers   map[string]*Handler // registered methods
 		Schedule   scheduler.SchedFunc // tasks are pushed in and wait to be handled
 		Options    options             // options
-		Dictionary message.Dictionary  // Route compressed Dictionary
+		Dictionary Dictionary          // Route compressed Dictionary
 	}
 )
 

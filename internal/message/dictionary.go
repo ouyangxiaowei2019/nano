@@ -7,18 +7,6 @@ import (
 	"sync"
 )
 
-type (
-	// DictionaryInfo is an item for Dictionary
-	DictionaryInfo struct {
-		// Fn is handler name in Servcie
-		Fn interface{}
-		// Code is route comporessed code
-		Code uint16
-	}
-	// Dictionary is alias for []*DictionaryInfo
-	Dictionary = []*DictionaryInfo
-)
-
 var (
 	// Routes is a map from route to code
 	Routes = make(map[string]uint16)
