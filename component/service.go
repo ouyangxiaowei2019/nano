@@ -24,7 +24,7 @@ import (
 	"errors"
 	"reflect"
 
-	"github.com/lonng/nano/internal/message"
+	"github.com/lonng/nano/message"
 	"github.com/lonng/nano/scheduler"
 )
 
