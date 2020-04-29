@@ -97,12 +97,12 @@ func (h *LocalHandler) register(comp component.Component, opts []component.Optio
 		h.localHandlers[n] = handler
 	}
 
-	for fn, code := range s.Dictionary {
-		fullName := runtime.FuncForPC(reflect.ValueOf(fn).Pointer()).Name()
+	for _, di := range s.Dictionary {
+		fullName := runtime.FuncForPC(reflect.ValueOf(di.Fn).Pointer()).Name()
 		lastIndex := strings.LastIndex(fullName, ".")
 		name := fullName[lastIndex+1:]
 		n := fmt.Sprintf("%s.%s", s.Name, name)
-		h.localDictionary[n] = code
+		h.localDictionary[n] = di.Code
 	}
 
 	return nil
@@ -137,7 +137,7 @@ func (h *LocalHandler) addRemoteDictionary(member *clusterpb.MemberInfo) {
 	for _, d := range member.Dictionaries {
 		h.localDictionary[d.Route] = uint16(d.Code)
 	}
-	message.SetDictionary(h.localDictionary)
+	message.WriteDictionary(h.localDictionary)
 }
 
 func (h *LocalHandler) delMember(addr string) {

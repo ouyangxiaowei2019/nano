@@ -7,6 +7,18 @@ import (
 	"sync"
 )
 
+type (
+	// DictionaryInfo is an item for Dictionary
+	DictionaryInfo struct {
+		// Fn is handler name in Servcie
+		Fn interface{}
+		// Code is route comporessed code
+		Code uint16
+	}
+	// Dictionary is alias for []*DictionaryInfo
+	Dictionary = []*DictionaryInfo
+)
+
 var (
 	// Routes is a map from route to code
 	Routes = make(map[string]uint16)
@@ -15,16 +27,16 @@ var (
 	rw    sync.RWMutex
 )
 
-// Dictionary returns dictionary for compressed route.
-func Dictionary() (map[string]uint16, map[uint16]string) {
+// ReadDictionary returns dictionary for compressed route.
+func ReadDictionary() (map[string]uint16, map[uint16]string) {
 	rw.RLock()
 	defer rw.RUnlock()
 
 	return Routes, Codes
 }
 
-// SetDictionary is to set dictionary when new route dictionray is found.
-func SetDictionary(dict map[string]uint16) {
+// WriteDictionary is to set dictionary when new route dictionray is found.
+func WriteDictionary(dict map[string]uint16) {
 	routes, codes := TransformDictionary(dict)
 
 	rw.Lock()

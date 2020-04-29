@@ -21,15 +21,16 @@
 package component
 
 import (
+	"github.com/lonng/nano/internal/message"
 	"github.com/lonng/nano/scheduler"
 )
 
 type (
 	options struct {
-		name          string                 // component name
-		renameHandler func(string) string    // rename handler name
-		schedule      scheduler.SchedFunc    // schedule service task
-		dictionary    map[interface{}]uint16 // schedName name
+		name          string              // component name
+		renameHandler func(string) string // rename handler name
+		schedule      scheduler.SchedFunc // schedule service task
+		dictionary    message.Dictionary  // Dictionary info slice
 	}
 
 	// Option used to customize handler
@@ -59,7 +60,7 @@ func WithScheduleFunc(fn scheduler.SchedFunc) Option {
 }
 
 // WithDictionary set dictionary for compressed route
-func WithDictionary(dict map[interface{}]uint16) Option {
+func WithDictionary(dict message.Dictionary) Option {
 	return func(opt *options) {
 		opt.dictionary = dict
 	}
