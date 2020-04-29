@@ -26,6 +26,7 @@ import (
 	"math/rand"
 	"net"
 	"reflect"
+	"runtime"
 	"sort"
 	"strings"
 	"sync"
@@ -50,9 +51,11 @@ var (
 
 type rpcHandler func(session *session.Session, msg *message.Message, noCopy bool)
 
+// LocalHandler stores local handlers & serivces info
 type LocalHandler struct {
-	localServices map[string]*component.Service // all registered service
-	localHandlers map[string]*component.Handler // all handler method
+	localServices   map[string]*component.Service // all registered service
+	localHandlers   map[string]*component.Handler // all handler method
+	localDictionary map[string]uint16             // all handler codes
 
 	mu             sync.RWMutex
 	remoteServices map[string][]*clusterpb.MemberInfo
@@ -61,13 +64,15 @@ type LocalHandler struct {
 	currentNode *Node
 }
 
+// NewHandler creates a new LocalHandler
 func NewHandler(currentNode *Node, pipeline pipeline.Pipeline) *LocalHandler {
 	h := &LocalHandler{
-		localServices:  make(map[string]*component.Service),
-		localHandlers:  make(map[string]*component.Handler),
-		remoteServices: map[string][]*clusterpb.MemberInfo{},
-		pipeline:       pipeline,
-		currentNode:    currentNode,
+		localServices:   make(map[string]*component.Service),
+		localHandlers:   make(map[string]*component.Handler),
+		localDictionary: make(map[string]uint16),
+		remoteServices:  map[string][]*clusterpb.MemberInfo{},
+		pipeline:        pipeline,
+		currentNode:     currentNode,
 	}
 
 	return h
@@ -91,12 +96,27 @@ func (h *LocalHandler) register(comp component.Component, opts []component.Optio
 		log.Println("Register local handler", n)
 		h.localHandlers[n] = handler
 	}
+
+	for fn, code := range s.Dictionary {
+		fullName := runtime.FuncForPC(reflect.ValueOf(fn).Pointer()).Name()
+		lastIndex := strings.LastIndex(fullName, ".")
+		name := fullName[lastIndex+1:]
+		n := fmt.Sprintf("%s.%s", s.Name, name)
+		h.localDictionary[n] = code
+	}
+
 	return nil
 }
 
 func (h *LocalHandler) initRemoteService(members []*clusterpb.MemberInfo) {
 	for _, m := range members {
 		h.addRemoteService(m)
+	}
+}
+
+func (h *LocalHandler) initRemoteDictionary(members []*clusterpb.MemberInfo) {
+	for _, m := range members {
+		h.addRemoteDictionary(m)
 	}
 }
 
@@ -108,6 +128,16 @@ func (h *LocalHandler) addRemoteService(member *clusterpb.MemberInfo) {
 		log.Println("Register remote service", s)
 		h.remoteServices[s] = append(h.remoteServices[s], member)
 	}
+}
+
+func (h *LocalHandler) addRemoteDictionary(member *clusterpb.MemberInfo) {
+	h.mu.Lock()
+	defer h.mu.Unlock()
+
+	for _, d := range member.Dictionaries {
+		h.localDictionary[d.Route] = uint16(d.Code)
+	}
+	message.SetDictionary(h.localDictionary)
 }
 
 func (h *LocalHandler) delMember(addr string) {
@@ -132,6 +162,7 @@ func (h *LocalHandler) delMember(addr string) {
 	}
 }
 
+// LocalService transforms local services info from map to slice
 func (h *LocalHandler) LocalService() []string {
 	var result []string
 	for service := range h.localServices {
@@ -141,6 +172,7 @@ func (h *LocalHandler) LocalService() []string {
 	return result
 }
 
+// RemoteService transforms remote services info from map to slice
 func (h *LocalHandler) RemoteService() []string {
 	h.mu.RLock()
 	defer h.mu.RUnlock()
@@ -150,6 +182,18 @@ func (h *LocalHandler) RemoteService() []string {
 		result = append(result, service)
 	}
 	sort.Strings(result)
+	return result
+}
+
+// LocalDictionary transforms local services info from map to slice
+func (h *LocalHandler) LocalDictionary() []*clusterpb.DictionaryInfo {
+	var result []*clusterpb.DictionaryInfo
+	for route, code := range h.localDictionary {
+		result = append(result, &clusterpb.DictionaryInfo{
+			Route: route,
+			Code:  uint32(code),
+		})
+	}
 	return result
 }
 

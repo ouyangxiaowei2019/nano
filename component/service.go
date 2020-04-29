@@ -40,12 +40,13 @@ type (
 	// Service implements a specific service, some of it's methods will be
 	// called when the correspond events is occurred.
 	Service struct {
-		Name     string              // name of service
-		Type     reflect.Type        // type of the receiver
-		Receiver reflect.Value       // receiver of methods for the service
-		Handlers map[string]*Handler // registered methods
-		Schedule scheduler.SchedFunc // tasks are pushed in and wait to be handled
-		Options  options             // options
+		Name       string                 // name of service
+		Type       reflect.Type           // type of the receiver
+		Receiver   reflect.Value          // receiver of methods for the service
+		Handlers   map[string]*Handler    // registered methods
+		Schedule   scheduler.SchedFunc    // tasks are pushed in and wait to be handled
+		Options    options                // options
+		Dictionary map[interface{}]uint16 // Route compressed Dictionary
 	}
 )
 
@@ -70,6 +71,10 @@ func NewService(comp Component, opts []Option) *Service {
 		s.Schedule = s.Options.schedule
 	} else {
 		s.Schedule = scheduler.Schedule
+	}
+
+	for fn, code := range s.Options.dictionary {
+		s.Dictionary[fn] = code
 	}
 
 	return s

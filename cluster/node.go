@@ -150,9 +150,10 @@ func (n *Node) initNode() error {
 		member := &Member{
 			isMaster: true,
 			memberInfo: &clusterpb.MemberInfo{
-				Label:       n.Label,
-				ServiceAddr: n.ServiceAddr,
-				Services:    n.handler.LocalService(),
+				Label:        n.Label,
+				ServiceAddr:  n.ServiceAddr,
+				Services:     n.handler.LocalService(),
+				Dictionaries: n.handler.LocalDictionary(),
 			},
 		}
 		n.cluster.members = append(n.cluster.members, member)
@@ -165,15 +166,17 @@ func (n *Node) initNode() error {
 		client := clusterpb.NewMasterClient(pool.Get())
 		request := &clusterpb.RegisterRequest{
 			MemberInfo: &clusterpb.MemberInfo{
-				Label:       n.Label,
-				ServiceAddr: n.ServiceAddr,
-				Services:    n.handler.LocalService(),
+				Label:        n.Label,
+				ServiceAddr:  n.ServiceAddr,
+				Services:     n.handler.LocalService(),
+				Dictionaries: n.handler.LocalDictionary(),
 			},
 		}
 		for {
 			resp, err := client.Register(context.Background(), request)
 			if err == nil {
 				n.handler.initRemoteService(resp.Members)
+				n.handler.initRemoteDictionary(resp.Members)
 				n.cluster.initMembers(resp.Members)
 				break
 			}
@@ -384,6 +387,7 @@ func (n *Node) HandleResponse(_ context.Context, req *clusterpb.ResponseMessage)
 // NewMember is called by grpc `NewMember`
 func (n *Node) NewMember(_ context.Context, req *clusterpb.NewMemberRequest) (*clusterpb.NewMemberResponse, error) {
 	n.handler.addRemoteService(req.MemberInfo)
+	n.handler.addRemoteDictionary(req.MemberInfo)
 	n.cluster.addMember(req.MemberInfo)
 	return &clusterpb.NewMemberResponse{}, nil
 }
