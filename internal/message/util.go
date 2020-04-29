@@ -20,7 +20,7 @@
 
 package message
 
-import "github.com/lonng/nano/env"
+import "github.com/lonng/nano/internal/env"
 
 func Serialize(v interface{}) ([]byte, error) {
 	if data, ok := v.([]byte); ok {

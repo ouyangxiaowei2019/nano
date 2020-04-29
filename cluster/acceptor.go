@@ -5,7 +5,7 @@ import (
 	"net"
 
 	"github.com/lonng/nano/cluster/clusterpb"
-	"github.com/lonng/nano/message"
+	"github.com/lonng/nano/internal/message"
 	"github.com/lonng/nano/mock"
 	"github.com/lonng/nano/session"
 )

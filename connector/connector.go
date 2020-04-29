@@ -6,9 +6,9 @@ import (
 	"sync"
 
 	"github.com/golang/protobuf/proto"
-	"github.com/lonng/nano/codec"
-	"github.com/lonng/nano/message"
-	"github.com/lonng/nano/packet"
+	"github.com/lonng/nano/internal/codec"
+	"github.com/lonng/nano/internal/message"
+	"github.com/lonng/nano/internal/packet"
 )
 
 type (

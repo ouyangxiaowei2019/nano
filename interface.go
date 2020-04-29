@@ -32,9 +32,9 @@ import (
 
 	"github.com/lonng/nano/cluster"
 	"github.com/lonng/nano/component"
-	"github.com/lonng/nano/env"
-	"github.com/lonng/nano/log"
-	"github.com/lonng/nano/runtime"
+	"github.com/lonng/nano/internal/env"
+	"github.com/lonng/nano/internal/log"
+	"github.com/lonng/nano/internal/runtime"
 	"github.com/lonng/nano/scheduler"
 )
 
