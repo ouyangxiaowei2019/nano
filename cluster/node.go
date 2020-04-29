@@ -378,7 +378,7 @@ func (n *Node) HandleResponse(_ context.Context, req *clusterpb.ResponseMessage)
 	if s == nil {
 		return &clusterpb.MemberHandleResponse{}, fmt.Errorf("session not found: %v", req.SessionId)
 	}
-	return &clusterpb.MemberHandleResponse{}, s.ResponseMID(req.Id, req.Route, req.Data)
+	return &clusterpb.MemberHandleResponse{}, s.ResponseMid(req.Id, req.Route, req.Data)
 }
 
 // NewMember is called by grpc `NewMember`

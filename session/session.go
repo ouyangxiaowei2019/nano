@@ -98,9 +98,9 @@ func (s *Session) Response(route string, v interface{}) error {
 	return s.entity.Response(route, v)
 }
 
-// ResponseMID responses message to client, mid is
+// ResponseMid responses message to client, mid is
 // request message ID
-func (s *Session) ResponseMID(mid uint64, route string, v interface{}) error {
+func (s *Session) ResponseMid(mid uint64, route string, v interface{}) error {
 	return s.entity.ResponseMid(mid, route, v)
 }
 
