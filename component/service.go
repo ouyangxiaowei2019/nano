@@ -22,6 +22,7 @@ package component
 
 import (
 	"errors"
+	"log"
 	"reflect"
 
 	"github.com/lonng/nano/scheduler"
@@ -129,7 +130,8 @@ func (s *Service) ExtractHandler() error {
 		} else {
 			str = "type " + s.Name + " has no exported methods of suitable type"
 		}
-		return errors.New(str)
+		log.Println(str)
+		return nil
 	}
 
 	for i := range s.Handlers {

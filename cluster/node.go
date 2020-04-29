@@ -72,7 +72,13 @@ type Node struct {
 	sessions map[int64]*session.Session
 }
 
+// CurrentNode is the running node.
+var CurrentNode *Node
+
+// Startup bootstraps a start up.
 func (n *Node) Startup() error {
+	CurrentNode = n
+
 	if n.ServiceAddr == "" {
 		return errors.New("service address cannot be empty in master node")
 	}
@@ -225,6 +231,7 @@ EXIT:
 	if n.server != nil {
 		n.server.GracefulStop()
 	}
+	CurrentNode = nil
 }
 
 // Enable current server accept connection
