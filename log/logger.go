@@ -27,9 +27,15 @@ import (
 
 // Logger represents  the log interface
 type Logger interface {
+	Print(v ...interface{})
+	Printf(format string, v ...interface{})
 	Println(v ...interface{})
 	Fatal(v ...interface{})
 	Fatalf(format string, v ...interface{})
+	Fatalln(v ...interface{})
+	Panic(v ...interface{})
+	Panicf(format string, v ...interface{})
+	Panicln(v ...interface{})
 }
 
 func init() {
@@ -37,9 +43,15 @@ func init() {
 }
 
 var (
+	Print   func(v ...interface{})
+	Printf  func(format string, v ...interface{})
 	Println func(v ...interface{})
 	Fatal   func(v ...interface{})
 	Fatalf  func(format string, v ...interface{})
+	Fatalln func(v ...interface{})
+	Panic   func(v ...interface{})
+	Panicf  func(format string, v ...interface{})
+	Panicln func(v ...interface{})
 )
 
 // SetLogger rewrites the default logger
@@ -47,7 +59,13 @@ func SetLogger(logger Logger) {
 	if logger == nil {
 		return
 	}
+	Print = logger.Print
+	Printf = logger.Printf
 	Println = logger.Println
 	Fatal = logger.Fatal
 	Fatalf = logger.Fatalf
+	Fatalln = logger.Fatalln
+	Panic = logger.Panic
+	Panicf = logger.Panicf
+	Panicln = logger.Panicln
 }
