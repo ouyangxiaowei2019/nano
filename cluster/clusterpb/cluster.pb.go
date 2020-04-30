@@ -29,7 +29,7 @@ const (
 // of the legacy proto package is being used.
 const _ = proto.ProtoPackageIsVersion4
 
-type DictionaryInfo struct {
+type DictionaryItem struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
@@ -38,8 +38,8 @@ type DictionaryInfo struct {
 	Code  uint32 `protobuf:"varint,2,opt,name=code,proto3" json:"code,omitempty"`
 }
 
-func (x *DictionaryInfo) Reset() {
-	*x = DictionaryInfo{}
+func (x *DictionaryItem) Reset() {
+	*x = DictionaryItem{}
 	if protoimpl.UnsafeEnabled {
 		mi := &file_cluster_proto_msgTypes[0]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -47,13 +47,13 @@ func (x *DictionaryInfo) Reset() {
 	}
 }
 
-func (x *DictionaryInfo) String() string {
+func (x *DictionaryItem) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*DictionaryInfo) ProtoMessage() {}
+func (*DictionaryItem) ProtoMessage() {}
 
-func (x *DictionaryInfo) ProtoReflect() protoreflect.Message {
+func (x *DictionaryItem) ProtoReflect() protoreflect.Message {
 	mi := &file_cluster_proto_msgTypes[0]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -65,19 +65,19 @@ func (x *DictionaryInfo) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use DictionaryInfo.ProtoReflect.Descriptor instead.
-func (*DictionaryInfo) Descriptor() ([]byte, []int) {
+// Deprecated: Use DictionaryItem.ProtoReflect.Descriptor instead.
+func (*DictionaryItem) Descriptor() ([]byte, []int) {
 	return file_cluster_proto_rawDescGZIP(), []int{0}
 }
 
-func (x *DictionaryInfo) GetRoute() string {
+func (x *DictionaryItem) GetRoute() string {
 	if x != nil {
 		return x.Route
 	}
 	return ""
 }
 
-func (x *DictionaryInfo) GetCode() uint32 {
+func (x *DictionaryItem) GetCode() uint32 {
 	if x != nil {
 		return x.Code
 	}
@@ -92,7 +92,7 @@ type MemberInfo struct {
 	Label        string            `protobuf:"bytes,1,opt,name=label,proto3" json:"label,omitempty"`
 	ServiceAddr  string            `protobuf:"bytes,2,opt,name=serviceAddr,proto3" json:"serviceAddr,omitempty"`
 	Services     []string          `protobuf:"bytes,3,rep,name=services,proto3" json:"services,omitempty"`
-	Dictionaries []*DictionaryInfo `protobuf:"bytes,4,rep,name=dictionaries,proto3" json:"dictionaries,omitempty"`
+	Dictionaries []*DictionaryItem `protobuf:"bytes,4,rep,name=dictionaries,proto3" json:"dictionaries,omitempty"`
 }
 
 func (x *MemberInfo) Reset() {
@@ -148,7 +148,7 @@ func (x *MemberInfo) GetServices() []string {
 	return nil
 }
 
-func (x *MemberInfo) GetDictionaries() []*DictionaryInfo {
+func (x *MemberInfo) GetDictionaries() []*DictionaryItem {
 	if x != nil {
 		return x.Dictionaries
 	}
@@ -1146,7 +1146,7 @@ func file_cluster_proto_rawDescGZIP() []byte {
 
 var file_cluster_proto_msgTypes = make([]protoimpl.MessageInfo, 19)
 var file_cluster_proto_goTypes = []interface{}{
-	(*DictionaryInfo)(nil),        // 0: clusterpb.DictionaryInfo
+	(*DictionaryItem)(nil),        // 0: clusterpb.DictionaryItem
 	(*MemberInfo)(nil),            // 1: clusterpb.MemberInfo
 	(*RegisterRequest)(nil),       // 2: clusterpb.RegisterRequest
 	(*RegisterResponse)(nil),      // 3: clusterpb.RegisterResponse
@@ -1167,7 +1167,7 @@ var file_cluster_proto_goTypes = []interface{}{
 	(*CloseSessionResponse)(nil),  // 18: clusterpb.CloseSessionResponse
 }
 var file_cluster_proto_depIdxs = []int32{
-	0,  // 0: clusterpb.MemberInfo.dictionaries:type_name -> clusterpb.DictionaryInfo
+	0,  // 0: clusterpb.MemberInfo.dictionaries:type_name -> clusterpb.DictionaryItem
 	1,  // 1: clusterpb.RegisterRequest.memberInfo:type_name -> clusterpb.MemberInfo
 	1,  // 2: clusterpb.RegisterResponse.members:type_name -> clusterpb.MemberInfo
 	1,  // 3: clusterpb.NewMemberRequest.memberInfo:type_name -> clusterpb.MemberInfo
@@ -1205,7 +1205,7 @@ func file_cluster_proto_init() {
 	}
 	if !protoimpl.UnsafeEnabled {
 		file_cluster_proto_msgTypes[0].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*DictionaryInfo); i {
+			switch v := v.(*DictionaryItem); i {
 			case 0:
 				return &v.state
 			case 1:

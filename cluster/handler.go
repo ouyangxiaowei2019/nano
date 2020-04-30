@@ -181,10 +181,10 @@ func (h *LocalHandler) RemoteService() []string {
 }
 
 // LocalDictionary transforms local services info from map to slice
-func (h *LocalHandler) LocalDictionary() []*clusterpb.DictionaryInfo {
-	var result []*clusterpb.DictionaryInfo
+func (h *LocalHandler) LocalDictionary() []*clusterpb.DictionaryItem {
+	var result []*clusterpb.DictionaryItem
 	for route, code := range h.localDictionary {
-		result = append(result, &clusterpb.DictionaryInfo{
+		result = append(result, &clusterpb.DictionaryItem{
 			Route: route,
 			Code:  uint32(code),
 		})

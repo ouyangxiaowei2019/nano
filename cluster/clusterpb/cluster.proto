@@ -3,7 +3,7 @@ package clusterpb;
 
 option go_package = ".;clusterpb";
 
-message DictionaryInfo{
+message DictionaryItem{
     string route = 1;
     uint32 code = 2;
 };
@@ -12,7 +12,7 @@ message MemberInfo {
     string label = 1;
     string serviceAddr = 2;
     repeated string services = 3;
-    repeated DictionaryInfo dictionaries = 4;
+    repeated DictionaryItem dictionaries = 4;
 }
 
 message RegisterRequest {

@@ -25,15 +25,15 @@ import (
 )
 
 type (
-	// DictionaryInfo is an item for Dictionary
-	DictionaryInfo struct {
+	// DictionaryItem is an item for Dictionary
+	DictionaryItem struct {
 		// Fn is handler name in Servcie
 		Func interface{}
 		// Code is route comporessed code
 		Code uint16
 	}
-	// Dictionary is alias for []*DictionaryInfo
-	Dictionary = []*DictionaryInfo
+	// Dictionary is alias for []*DictionaryItem
+	Dictionary = []*DictionaryItem
 
 	options struct {
 		name          string              // component name
