@@ -94,9 +94,9 @@ func (s *Service) suitableHandlerMethods(typ reflect.Type) map[string]*Handler {
 			}
 			// find commpressed code
 			var code uint16
-			for _, item := range s.Options.dictionary {
-				if reflect.ValueOf(item.Func).Pointer() == method.Func.Pointer() {
-					code = item.Code
+			for c, fn := range s.Options.dictionary {
+				if reflect.ValueOf(fn).Pointer() == method.Func.Pointer() {
+					code = c
 					break
 				}
 			}

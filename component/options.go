@@ -25,21 +25,11 @@ import (
 )
 
 type (
-	// DictionaryItem is an item for Dictionary
-	DictionaryItem struct {
-		// Fn is handler name in Servcie
-		Func interface{}
-		// Code is route comporessed code
-		Code uint16
-	}
-	// Dictionary is alias for []*DictionaryItem
-	Dictionary = []*DictionaryItem
-
 	options struct {
-		name          string              // component name
-		renameHandler func(string) string // rename handler name
-		schedule      scheduler.SchedFunc // schedule service task
-		dictionary    Dictionary          // Dictionary info slice
+		name          string                 // component name
+		renameHandler func(string) string    // rename handler name
+		schedule      scheduler.SchedFunc    // schedule service task
+		dictionary    map[uint16]interface{} // Dictionary info slice
 	}
 
 	// Option used to customize handler
@@ -69,7 +59,7 @@ func WithScheduleFunc(fn scheduler.SchedFunc) Option {
 }
 
 // WithDictionary set dictionary for compressed route
-func WithDictionary(dict Dictionary) Option {
+func WithDictionary(dict map[uint16]interface{}) Option {
 	return func(opt *options) {
 		opt.dictionary = dict
 	}
