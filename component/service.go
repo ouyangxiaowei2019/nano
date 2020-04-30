@@ -36,18 +36,18 @@ type (
 		Method   reflect.Method // method stub
 		Type     reflect.Type   // low-level type of method
 		IsRawArg bool           // whether the data need to serialize
+		Code     uint16         // Route compressed code
 	}
 
 	// Service implements a specific service, some of it's methods will be
 	// called when the correspond events is occurred.
 	Service struct {
-		Name       string              // name of service
-		Type       reflect.Type        // type of the receiver
-		Receiver   reflect.Value       // receiver of methods for the service
-		Handlers   map[string]*Handler // registered methods
-		Schedule   scheduler.SchedFunc // tasks are pushed in and wait to be handled
-		Options    options             // options
-		Dictionary Dictionary          // Route compressed Dictionary
+		Name     string              // name of service
+		Type     reflect.Type        // type of the receiver
+		Receiver reflect.Value       // receiver of methods for the service
+		Handlers map[string]*Handler // registered methods
+		Schedule scheduler.SchedFunc // tasks are pushed in and wait to be handled
+		Options  options             // options
 	}
 )
 
@@ -74,10 +74,6 @@ func NewService(comp Component, opts []Option) *Service {
 		s.Schedule = scheduler.Schedule
 	}
 
-	for _, dictionaryInfo := range s.Options.dictionary {
-		s.Dictionary = append(s.Dictionary, dictionaryInfo)
-	}
-
 	return s
 }
 
@@ -97,7 +93,21 @@ func (s *Service) suitableHandlerMethods(typ reflect.Type) map[string]*Handler {
 			if s.Options.renameHandler != nil {
 				mn = s.Options.renameHandler(mn)
 			}
-			methods[mn] = &Handler{Method: method, Type: mt.In(2), IsRawArg: raw}
+			// find commpressed code
+			var code uint16
+			for _, item := range s.Options.dictionary {
+				if reflect.ValueOf(item.Func).Pointer() == method.Func.Pointer() {
+					code = item.Code
+					break
+				}
+			}
+
+			methods[mn] = &Handler{
+				Method:   method,
+				Type:     mt.In(2),
+				IsRawArg: raw,
+				Code:     code,
+			}
 		}
 	}
 	return methods

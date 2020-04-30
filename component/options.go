@@ -28,7 +28,7 @@ type (
 	// DictionaryInfo is an item for Dictionary
 	DictionaryInfo struct {
 		// Fn is handler name in Servcie
-		Fn interface{}
+		Func interface{}
 		// Code is route comporessed code
 		Code uint16
 	}

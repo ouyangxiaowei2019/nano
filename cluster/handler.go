@@ -26,7 +26,6 @@ import (
 	"math/rand"
 	"net"
 	"reflect"
-	"runtime"
 	"sort"
 	"strings"
 	"sync"
@@ -95,14 +94,10 @@ func (h *LocalHandler) register(comp component.Component, opts []component.Optio
 		n := fmt.Sprintf("%s.%s", s.Name, name)
 		log.Println("Register local handler", n)
 		h.localHandlers[n] = handler
-	}
-
-	for _, di := range s.Dictionary {
-		fullName := runtime.FuncForPC(reflect.ValueOf(di.Fn).Pointer()).Name()
-		lastIndex := strings.LastIndex(fullName, ".")
-		name := fullName[lastIndex+1:]
-		n := fmt.Sprintf("%s.%s", s.Name, name)
-		h.localDictionary[n] = di.Code
+		if handler.Code > 0 {
+			h.localDictionary[n] = handler.Code
+			message.WriteDictionaryItem(n, handler.Code)
+		}
 	}
 
 	return nil

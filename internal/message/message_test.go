@@ -12,7 +12,7 @@ func TestEncode(t *testing.T) {
 		"test.test.test2": 102,
 		"test.test.test3": 103,
 	}
-	routes, codes := TransformDictionary(dict)
+	routes, codes := WriteDictionary(dict)
 	m1 := &Message{
 		Type:       Request,
 		ID:         100,
