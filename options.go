@@ -7,7 +7,7 @@ import (
 	"github.com/lonng/nano/cluster"
 	"github.com/lonng/nano/component"
 	"github.com/lonng/nano/internal/env"
-	"github.com/lonng/nano/internal/log"
+	"github.com/lonng/nano/log"
 	"github.com/lonng/nano/pipeline"
 	"github.com/lonng/nano/serialize"
 	"google.golang.org/grpc"

@@ -30,7 +30,7 @@ import (
 
 	"github.com/lonng/nano/internal/codec"
 	"github.com/lonng/nano/internal/env"
-	"github.com/lonng/nano/internal/log"
+	"github.com/lonng/nano/log"
 	"github.com/lonng/nano/internal/message"
 	"github.com/lonng/nano/pipeline"
 	"github.com/lonng/nano/scheduler"
