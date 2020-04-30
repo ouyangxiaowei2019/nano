@@ -52,9 +52,8 @@ type rpcHandler func(session *session.Session, msg *message.Message, noCopy bool
 
 // LocalHandler stores local handlers & serivces info
 type LocalHandler struct {
-	localServices   map[string]*component.Service // all registered service
-	localHandlers   map[string]*component.Handler // all handler method
-	localDictionary map[string]uint16             // all handler codes
+	localServices map[string]*component.Service // all registered service
+	localHandlers map[string]*component.Handler // all handler method
 
 	mu             sync.RWMutex
 	remoteServices map[string][]*clusterpb.MemberInfo
@@ -66,12 +65,11 @@ type LocalHandler struct {
 // NewHandler creates a new LocalHandler
 func NewHandler(currentNode *Node, pipeline pipeline.Pipeline) *LocalHandler {
 	h := &LocalHandler{
-		localServices:   make(map[string]*component.Service),
-		localHandlers:   make(map[string]*component.Handler),
-		localDictionary: make(map[string]uint16),
-		remoteServices:  map[string][]*clusterpb.MemberInfo{},
-		pipeline:        pipeline,
-		currentNode:     currentNode,
+		localServices:  make(map[string]*component.Service),
+		localHandlers:  make(map[string]*component.Handler),
+		remoteServices: map[string][]*clusterpb.MemberInfo{},
+		pipeline:       pipeline,
+		currentNode:    currentNode,
 	}
 
 	return h
@@ -94,10 +92,7 @@ func (h *LocalHandler) register(comp component.Component, opts []component.Optio
 		n := fmt.Sprintf("%s.%s", s.Name, name)
 		log.Println("Register local handler", n)
 		h.localHandlers[n] = handler
-		if handler.Code > 0 {
-			h.localDictionary[n] = handler.Code
-			message.WriteDictionaryItem(n, handler.Code)
-		}
+		message.WriteDictionaryItem(n, handler.Code)
 	}
 
 	return nil
@@ -129,10 +124,11 @@ func (h *LocalHandler) addRemoteDictionary(member *clusterpb.MemberInfo) {
 	h.mu.Lock()
 	defer h.mu.Unlock()
 
-	for _, d := range member.Dictionaries {
-		h.localDictionary[d.Route] = uint16(d.Code)
+	var dictionary = make(map[string]uint16)
+	for _, d := range member.Dictionary {
+		dictionary[d.Route] = uint16(d.Code)
 	}
-	message.WriteDictionary(h.localDictionary)
+	message.WriteDictionary(dictionary)
 }
 
 func (h *LocalHandler) delMember(addr string) {
@@ -183,10 +179,11 @@ func (h *LocalHandler) RemoteService() []string {
 // LocalDictionary transforms local services info from map to slice
 func (h *LocalHandler) LocalDictionary() []*clusterpb.DictionaryItem {
 	var result []*clusterpb.DictionaryItem
-	for route, code := range h.localDictionary {
+	for name, handler := range h.localHandlers {
 		result = append(result, &clusterpb.DictionaryItem{
-			Route: route,
-			Code:  uint32(code),
+			Route: name,
+			Code:  uint32(handler.Code),
+			Type:  handler.Type.String(),
 		})
 	}
 	return result

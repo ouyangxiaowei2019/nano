@@ -6,13 +6,14 @@ option go_package = ".;clusterpb";
 message DictionaryItem{
     string route = 1;
     uint32 code = 2;
+    string type = 3;
 };
 
 message MemberInfo {
     string label = 1;
     string serviceAddr = 2;
     repeated string services = 3;
-    repeated DictionaryItem dictionaries = 4;
+    repeated DictionaryItem dictionary = 4;
 }
 
 message RegisterRequest {

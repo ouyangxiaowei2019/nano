@@ -25,8 +25,10 @@ func WriteDictionaryItem(route string, code uint16) (map[string]uint16, map[uint
 	rw.Lock()
 	defer rw.Unlock()
 
-	Routes[route] = code
-	Codes[code] = route
+	if code > 0 {
+		Routes[route] = code
+		Codes[code] = route
+	}
 
 	return Routes, Codes
 }
@@ -37,8 +39,10 @@ func WriteDictionary(dict map[string]uint16) (map[string]uint16, map[uint16]stri
 	defer rw.Unlock()
 
 	for route, code := range dict {
-		Routes[route] = code
-		Codes[code] = route
+		if code > 0 {
+			Routes[route] = code
+			Codes[code] = route
+		}
 	}
 
 	return Routes, Codes

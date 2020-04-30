@@ -156,10 +156,10 @@ func (n *Node) initNode() error {
 		member := &Member{
 			isMaster: true,
 			memberInfo: &clusterpb.MemberInfo{
-				Label:        n.Label,
-				ServiceAddr:  n.ServiceAddr,
-				Services:     n.handler.LocalService(),
-				Dictionaries: n.handler.LocalDictionary(),
+				Label:       n.Label,
+				ServiceAddr: n.ServiceAddr,
+				Services:    n.handler.LocalService(),
+				Dictionary:  n.handler.LocalDictionary(),
 			},
 		}
 		n.cluster.members = append(n.cluster.members, member)
@@ -172,10 +172,10 @@ func (n *Node) initNode() error {
 		client := clusterpb.NewMasterClient(pool.Get())
 		request := &clusterpb.RegisterRequest{
 			MemberInfo: &clusterpb.MemberInfo{
-				Label:        n.Label,
-				ServiceAddr:  n.ServiceAddr,
-				Services:     n.handler.LocalService(),
-				Dictionaries: n.handler.LocalDictionary(),
+				Label:       n.Label,
+				ServiceAddr: n.ServiceAddr,
+				Services:    n.handler.LocalService(),
+				Dictionary:  n.handler.LocalDictionary(),
 			},
 		}
 		for {
