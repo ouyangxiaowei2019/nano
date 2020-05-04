@@ -40,7 +40,7 @@ const (
 type Task func()
 
 // SchedFunc is the Func type of schedule
-type SchedFunc func(session *session.Session, task Task)
+type SchedFunc func(session *session.Session, data interface{}, task Task)
 
 var (
 	chDie   = make(chan struct{})
@@ -96,7 +96,7 @@ func Close() {
 }
 
 // Schedule is to fill the default func for Service.Schedule
-func Schedule(session *session.Session, task Task) {
+func Schedule(_ *session.Session, _ interface{}, task Task) {
 	PushTask(task)
 }
 

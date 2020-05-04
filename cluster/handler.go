@@ -433,5 +433,5 @@ func (h *LocalHandler) localProcess(handler *component.Handler, lastMid uint64, 
 	if !found {
 		log.Println(fmt.Sprintf("Service not found: %+v", serviceName))
 	}
-	service.Schedule(session, task)
+	service.Schedule(session, data, task)
 }
