@@ -35,9 +35,9 @@ import (
 	"github.com/lonng/nano/cluster/clusterpb"
 	"github.com/lonng/nano/component"
 	"github.com/lonng/nano/internal/env"
-	"github.com/lonng/nano/log"
 	"github.com/lonng/nano/internal/message"
 	"github.com/lonng/nano/internal/packet"
+	"github.com/lonng/nano/log"
 	"github.com/lonng/nano/pipeline"
 	"github.com/lonng/nano/session"
 )
@@ -433,5 +433,5 @@ func (h *LocalHandler) localProcess(handler *component.Handler, lastMid uint64, 
 	if !found {
 		log.Println(fmt.Sprintf("Service not found: %+v", serviceName))
 	}
-	service.Schedule(session, data, task)
+	service.Schedule(session, task)
 }
