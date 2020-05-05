@@ -400,16 +400,18 @@ func (h *LocalHandler) localProcess(handler *component.Handler, lastMid uint64, 
 	}
 
 	if env.Debug {
-		log.Println(fmt.Sprintf("UID=%d, Message={%s}, Data=%+v", session.UID(), msg.String(), data))
+		log.Println(fmt.Sprintf("UID=%d, Mid=%d, Message={%s}, Data=%+v", session.UID(), lastMid, msg.String(), data))
 	}
 
 	args := []reflect.Value{handler.Receiver, reflect.ValueOf(session), reflect.ValueOf(data)}
 	task := func() {
-		switch v := session.NetworkEntity().(type) {
-		case *agent:
-			v.lastMid = lastMid
-		case *acceptor:
-			v.lastMid = lastMid
+		if lastMid > 0 {
+			switch v := session.NetworkEntity().(type) {
+			case *agent:
+				v.lastMid = lastMid
+			case *acceptor:
+				v.lastMid = lastMid
+			}
 		}
 
 		result := handler.Method.Func.Call(args)
