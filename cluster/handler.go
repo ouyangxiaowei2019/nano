@@ -208,7 +208,6 @@ func (h *LocalHandler) handle(conn net.Conn) {
 		}
 
 		members := h.currentNode.cluster.remoteAddrs()
-		log.Println("===>", len(members))
 		for _, remote := range members {
 			log.Println("Notify remote server success", remote)
 			pool, err := h.currentNode.rpcClient.getConnPool(remote)
