@@ -231,7 +231,7 @@ EXIT:
 	if n.server != nil {
 		n.server.GracefulStop()
 	}
-	log.Println("xxxxxx")
+
 	CurrentNode = nil
 }
 
