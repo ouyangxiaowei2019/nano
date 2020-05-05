@@ -133,9 +133,9 @@ func Encode(m *Message, routes map[string]uint16) ([]byte, error) {
 }
 
 // Decode unmarshal the bytes slice to a message
-func Decode(data []byte, codes map[uint16]string) (*Message, error) {
+func Decode(data []byte, codes map[uint16]string) (*Message, bool, error) {
 	if len(data) < msgHeadLength {
-		return nil, ErrInvalidMessage
+		return nil, false, ErrInvalidMessage
 	}
 	var offset uint64 = 0
 
@@ -146,7 +146,7 @@ func Decode(data []byte, codes map[uint16]string) (*Message, error) {
 	m.Type = Type(flag & msgTypeMask)
 	m.compressed = flag&msgRouteNotCompressMask == 0
 	if invalidType(m.Type) {
-		return nil, ErrWrongMessageType
+		return nil, false, ErrWrongMessageType
 	}
 
 	// decode msg ID
@@ -159,7 +159,7 @@ func Decode(data []byte, codes map[uint16]string) (*Message, error) {
 		code := binary.BigEndian.Uint16(data[offset:])
 		route, ok := codes[code]
 		if !ok {
-			return nil, ErrRouteInfoNotFound
+			return nil, false, ErrRouteInfoNotFound
 		}
 		m.Route = route
 		offset += 2
@@ -175,5 +175,5 @@ func Decode(data []byte, codes map[uint16]string) (*Message, error) {
 
 	// decode data
 	m.Data = data[offset:]
-	return m, nil
+	return m, m.compressed, nil
 }

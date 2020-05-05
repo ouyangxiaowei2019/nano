@@ -263,10 +263,15 @@ func (h *LocalHandler) handle(conn net.Conn) {
 }
 
 func (h *LocalHandler) processPacket(agent *agent, p *packet.Packet) error {
-	msg, err := message.Decode(p.Data, agent.codes)
+	msg, compressed, err := message.Decode(p.Data, agent.codes)
 	if err != nil {
 		return err
 	}
+	if msg.ID == 1 {
+		agent.compressed = compressed
+		log.Println("set session Response & Push compress flag:%v", compressed)
+	}
+
 	h.processMessage(agent.session, msg, false)
 
 	agent.lastAt = time.Now().Unix()

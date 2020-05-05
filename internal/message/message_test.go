@@ -24,7 +24,7 @@ func TestEncode(t *testing.T) {
 	if err != nil {
 		t.Error(err.Error())
 	}
-	dm1, err := Decode(em1, codes)
+	dm1, _, err := Decode(em1, codes)
 	if err != nil {
 		t.Error(err.Error())
 	}
@@ -46,7 +46,7 @@ func TestEncode(t *testing.T) {
 	if err != nil {
 		t.Error(err.Error())
 	}
-	dm2, err := Decode(em2, codes)
+	dm2, _, err := Decode(em2, codes)
 	if err != nil {
 		t.Error(err.Error())
 	}
@@ -67,7 +67,7 @@ func TestEncode(t *testing.T) {
 	if err != nil {
 		t.Error(err.Error())
 	}
-	dm3, err := Decode(em3, codes)
+	dm3, _, err := Decode(em3, codes)
 	if err != nil {
 		t.Error(err.Error())
 	}
@@ -88,7 +88,7 @@ func TestEncode(t *testing.T) {
 	if err != nil {
 		t.Error(err.Error())
 	}
-	dm4, err := Decode(em4, codes)
+	dm4, _, err := Decode(em4, codes)
 	if err != nil {
 		t.Error(err.Error())
 	}
@@ -110,7 +110,7 @@ func TestEncode(t *testing.T) {
 	if err != nil {
 		t.Error(err.Error())
 	}
-	dm5, err := Decode(em5, codes)
+	dm5, _, err := Decode(em5, codes)
 	if err != nil {
 		t.Error(err.Error())
 	}
@@ -131,7 +131,7 @@ func TestEncode(t *testing.T) {
 	if err != nil {
 		t.Error(err.Error())
 	}
-	dm6, err := Decode(em6, codes)
+	dm6, _, err := Decode(em6, codes)
 	if err != nil {
 		t.Error(err.Error())
 	}
@@ -152,7 +152,7 @@ func TestEncode(t *testing.T) {
 	if err != nil {
 		t.Error(err.Error())
 	}
-	dm7, err := Decode(em7, codes)
+	dm7, _, err := Decode(em7, codes)
 	if err != nil {
 		t.Error(err.Error())
 	}
@@ -174,7 +174,7 @@ func TestEncode(t *testing.T) {
 	if err != nil {
 		t.Error(err.Error())
 	}
-	dm8, err := Decode(em8, codes)
+	dm8, _, err := Decode(em8, codes)
 	if err != nil {
 		t.Error(err.Error())
 	}

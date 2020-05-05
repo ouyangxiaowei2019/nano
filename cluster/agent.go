@@ -67,6 +67,7 @@ type (
 		srv        reflect.Value     // cached session reflect.Value
 		routes     map[string]uint16 // copy system routes for agent
 		codes      map[uint16]string // copy system codes for agent
+		compressed bool              // whether to use compressed msg to client
 	}
 
 	pendingMessage struct {
@@ -290,7 +291,11 @@ func (a *agent) write() {
 				}
 			}
 
-			em, err := message.Encode(m, a.routes)
+			var routes map[string]uint16
+			if a.compressed {
+				routes = a.routes
+			}
+			em, err := message.Encode(m, routes)
 			if err != nil {
 				log.Println(err.Error())
 				break

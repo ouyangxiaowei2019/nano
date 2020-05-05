@@ -219,13 +219,12 @@ func (c *Connector) read() {
 }
 
 func (c *Connector) processPacket(p *packet.Packet) {
-	msg, err := message.Decode(p.Data, c.codes)
+	msg, _, err := message.Decode(p.Data, c.codes)
 	if err != nil {
 		log.Println(err.Error())
 		return
 	}
 	c.processMessage(msg)
-
 }
 
 func (c *Connector) processMessage(msg *message.Message) {
