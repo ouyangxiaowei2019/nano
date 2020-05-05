@@ -9,7 +9,7 @@ import (
 	"github.com/lonng/nano/connector"
 	"github.com/lonng/nano/scheduler"
 	"github.com/lonng/nano/session"
-	"github.com/lonng/nano/test/testdata"
+	"github.com/lonng/nano/benchmark/testdata"
 	. "github.com/pingcap/check"
 )
 

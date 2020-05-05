@@ -12,7 +12,7 @@ import (
 	"github.com/lonng/nano/component"
 	"github.com/lonng/nano/connector"
 	"github.com/lonng/nano/serialize/protobuf"
-	"github.com/lonng/nano/test/testdata"
+	"github.com/lonng/nano/benchmark/testdata"
 )
 
 const (
