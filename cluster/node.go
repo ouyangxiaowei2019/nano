@@ -34,8 +34,8 @@ import (
 	"github.com/lonng/nano/cluster/clusterpb"
 	"github.com/lonng/nano/component"
 	"github.com/lonng/nano/internal/env"
-	"github.com/lonng/nano/log"
 	"github.com/lonng/nano/internal/message"
+	"github.com/lonng/nano/log"
 	"github.com/lonng/nano/pipeline"
 	"github.com/lonng/nano/scheduler"
 	"github.com/lonng/nano/session"
@@ -231,6 +231,7 @@ EXIT:
 	if n.server != nil {
 		n.server.GracefulStop()
 	}
+	log.Println("xxxxxx")
 	CurrentNode = nil
 }
 

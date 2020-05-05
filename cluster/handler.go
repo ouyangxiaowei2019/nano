@@ -191,7 +191,7 @@ func (h *LocalHandler) LocalDictionary() []*clusterpb.DictionaryItem {
 
 func (h *LocalHandler) handle(conn net.Conn) {
 	// create a client agent and startup write gorontine
-	agent := newAgent(conn, h.pipeline, h.remoteProcess)
+	agent := newAgent(conn, h.pipeline, h.processMessage)
 	h.currentNode.storeSession(agent.session)
 
 	// startup write goroutine
