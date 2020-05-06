@@ -4,12 +4,14 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/lonng/nano/serialize/protobuf"
+
+	"github.com/lonng/nano/benchmark/testdata"
 	"github.com/lonng/nano/cluster"
 	"github.com/lonng/nano/component"
 	"github.com/lonng/nano/connector"
 	"github.com/lonng/nano/scheduler"
 	"github.com/lonng/nano/session"
-	"github.com/lonng/nano/benchmark/testdata"
 	. "github.com/pingcap/check"
 )
 
@@ -102,7 +104,9 @@ func (s *nodeSuite) TestNodeStartup(c *C) {
 	c.Assert(member2Handler.LocalService(), DeepEquals, []string{"GameComponent"})
 	c.Assert(member2Handler.RemoteService(), DeepEquals, []string{"GateComponent", "MasterComponent"})
 
-	connector := connector.NewConnector()
+	connector := connector.NewConnector(
+		connector.WithSerializer(protobuf.NewSerializer()),
+	)
 
 	chWait := make(chan struct{})
 	connector.OnConnected(func() {

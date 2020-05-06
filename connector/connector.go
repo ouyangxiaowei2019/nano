@@ -1,11 +1,11 @@
 package connector
 
 import (
+	"fmt"
 	"log"
 	"net"
 	"sync"
 
-	"github.com/golang/protobuf/proto"
 	"github.com/lonng/nano/internal/codec"
 	"github.com/lonng/nano/internal/message"
 	"github.com/lonng/nano/internal/packet"
@@ -19,6 +19,8 @@ type (
 
 	// Connector is a tiny Nano client
 	Connector struct {
+		Options
+
 		conn   net.Conn       // low-level connection
 		codec  *codec.Decoder // decoder
 		die    chan struct{}  // connector close channel
@@ -33,15 +35,17 @@ type (
 		muResponses sync.RWMutex
 		responses   map[uint64]Callback
 
-		connectedCallback func()            // connected callback
-		routes            map[string]uint16 // copy system routes for agent
-		codes             map[uint16]string // copy system codes for agent
+		connectedCallback func() // connected callback
+
+		routes map[string]uint16 // copy system routes for agent
+		codes  map[uint16]string // copy system codes for agent
 	}
 )
 
 // NewConnector create a new Connector
-func NewConnector() *Connector {
-	return &Connector{
+func NewConnector(opts ...Option) *Connector {
+
+	c := &Connector{
 		die:       make(chan struct{}),
 		codec:     codec.NewDecoder(),
 		chSend:    make(chan []byte, 64),
@@ -51,6 +55,14 @@ func NewConnector() *Connector {
 		routes:    make(map[string]uint16),
 		codes:     make(map[uint16]string),
 	}
+
+	for i := range opts {
+		opt := opts[i]
+		opt(&c.Options)
+	}
+
+	c.routes, c.codes = message.ParseDictionary(c.dictionary)
+	return c
 }
 
 // Start connect to the server and send/recv between the c/s
@@ -71,14 +83,19 @@ func (c *Connector) Start(addr string) error {
 	return nil
 }
 
+// Name returns the name for connector
+func (c *Connector) Name() string {
+	return c.name
+}
+
 // OnConnected set the callback which will be called when the client connected to the server
 func (c *Connector) OnConnected(callback func()) {
 	c.connectedCallback = callback
 }
 
 // Request send a request to server and register a callbck for the response
-func (c *Connector) Request(route string, v proto.Message, callback Callback) error {
-	data, err := serialize(v)
+func (c *Connector) Request(route string, v interface{}, callback Callback) error {
+	data, err := c.Serialize(v)
 	if err != nil {
 		return err
 	}
@@ -100,12 +117,11 @@ func (c *Connector) Request(route string, v proto.Message, callback Callback) er
 }
 
 // Notify send a notification to server
-func (c *Connector) Notify(route string, v proto.Message) error {
-	data, err := serialize(v)
+func (c *Connector) Notify(route string, v interface{}) error {
+	data, err := c.Serialize(v)
 	if err != nil {
 		return err
 	}
-
 	msg := &message.Message{
 		Type:  message.Notify,
 		Route: route,
@@ -250,10 +266,38 @@ func (c *Connector) processMessage(msg *message.Message) {
 	}
 }
 
-func serialize(v proto.Message) ([]byte, error) {
-	data, err := proto.Marshal(v)
+// Serialize marshals customized data into byte slice
+func (c *Connector) Serialize(v interface{}) ([]byte, error) {
+	if data, ok := v.([]byte); ok {
+		return data, nil
+	}
+
+	if c.serializer == nil {
+		return nil, fmt.Errorf("Serializer is not set")
+	}
+
+	data, err := c.serializer.Marshal(v)
 	if err != nil {
 		return nil, err
 	}
+
 	return data, nil
+}
+
+// Deserialize Unmarshals byte slice into customized data
+func (c *Connector) Deserialize(data []byte, v interface{}) error {
+	var err error
+	if c.serializer == nil {
+		v = data
+	}
+
+	if c.serializer == nil {
+		return fmt.Errorf("Serializer is not set")
+	}
+
+	if err = c.serializer.Unmarshal(data, v); err != nil {
+		return err
+	}
+
+	return nil
 }
