@@ -87,7 +87,7 @@ func (n *Node) Startup() error {
 	n.handler = NewHandler(n, n.Pipeline)
 	components := n.Components.List()
 	for _, c := range components {
-		err := n.handler.register(c.Comp, c.Opts)
+		err := n.handler.Register(c.Comp, c.Opts)
 		if err != nil {
 			return err
 		}

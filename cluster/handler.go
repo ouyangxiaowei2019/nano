@@ -75,7 +75,8 @@ func NewHandler(currentNode *Node, pipeline pipeline.Pipeline) *LocalHandler {
 	return h
 }
 
-func (h *LocalHandler) register(comp component.Component, opts []component.Option) error {
+// Register register component on LocalHandler
+func (h *LocalHandler) Register(comp component.Component, opts []component.Option) error {
 	s := component.NewService(comp, opts)
 
 	if _, ok := h.localServices[s.Name]; ok {
@@ -187,6 +188,15 @@ func (h *LocalHandler) LocalDictionary() []*clusterpb.DictionaryItem {
 		})
 	}
 	return result
+}
+
+// RouteHandler routes handler from localHandlers by route
+func (h *LocalHandler) RouteHandler(route string) (*component.Handler, error) {
+	handler, found := h.localHandlers[route]
+	if !found {
+		return nil, fmt.Errorf("Handler is not found by route")
+	}
+	return handler, nil
 }
 
 func (h *LocalHandler) handle(conn net.Conn) {
